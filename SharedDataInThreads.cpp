@@ -75,3 +75,61 @@ void foo()
 }
 
 /**线程安全的栈*/
+#include "threadsafe_stack.h"
+
+/**使用std::lock解决死锁*/
+// 这里的std::lock()需要包含<mutex>头文件
+class some_big_object {
+	some_big_object();
+};
+void swap(some_big_object& lhs, some_big_object& rhs);
+class X
+{
+private:
+	some_big_object some_detail;
+	std::mutex m;
+public:
+	X(some_big_object const& sd) :some_detail(sd) {}
+	friend void swap(X& lhs, X& rhs)
+	{
+		if (&lhs == &rhs)
+			return;
+		std::lock(lhs.m, rhs.m); // 用std::lock锁住两个互斥量，两个互斥量要么全部锁住，要么一个都不锁
+		std::lock_guard<std::mutex> lock_a(lhs.m, std::adopt_lock); // 提供 std::adopt_lock 参数除了表示 std::lock_guard 对象已经上锁外，还表示现成的锁，而非尝试创建新的锁。
+		std::lock_guard<std::mutex> lock_b(rhs.m, std::adopt_lock); 
+		swap(lhs.some_detail, rhs.some_detail);
+	}
+};
+
+/**使用层次锁来避免死锁*/
+#include"HIERARCHICAL_MUTEX.h"
+hierarchical_mutex high_level_mutex(10000); // 1
+hierarchical_mutex low_level_mutex(5000); // 2
+int do_low_level_stuff();
+int low_level_func()
+{
+	std::lock_guard<hierarchical_mutex> lk(low_level_mutex); // 3
+	return do_low_level_stuff();
+}
+void high_level_stuff(int some_param);
+void high_level_func()
+{
+	std::lock_guard<hierarchical_mutex> lk(high_level_mutex); // 4
+	high_level_stuff(low_level_func()); // 5
+}
+void thread_a() // 6
+{
+	high_level_func();
+}
+hierarchical_mutex other_mutex(100); // 7
+void do_other_stuff();
+void other_stuff()
+{
+	high_level_func(); // 8
+	do_other_stuff();
+}
+void thread_b() // 9
+{
+	std::lock_guard<hierarchical_mutex> lk(other_mutex); // 10
+	other_stuff();
+}

@@ -152,7 +152,7 @@ T parallel_accmulate(Iterator first, Iterator last, T init) {
 std::thread::id master_thread = std::this_thread::get_id();
 void some_core_part_of_algorithm()
 {
-	if (std::this_thread::get_id() == master_thread) //如果是主进程
+	if (std::this_thread::get_id() == master_thread)
 	{
 		cout << "It's master thread." << endl;
 	}
@@ -176,6 +176,6 @@ int main(){
 	t1 = std::thread(some_other_function); // 3
 	std::thread t3; // 4
 	t3 = std::move(t2); // 5
-	std::terminate();
+	//std::terminate();
 	//t1 = std::move(t3); // 6 赋值操作将使程序崩溃 不可通过赋新值来抛弃一个进程
 }
