@@ -103,33 +103,58 @@ public:
 
 /**使用层次锁来避免死锁*/
 #include"HIERARCHICAL_MUTEX.h"
-hierarchical_mutex high_level_mutex(10000); // 1
-hierarchical_mutex low_level_mutex(5000); // 2
+/**
+ * 底层的获取后高层的无法加锁
+*/
+hierarchical_mutex high_level_mutex(10000);
+hierarchical_mutex low_level_mutex(5000);
+
 int do_low_level_stuff();
-int low_level_func()
-{
-	std::lock_guard<hierarchical_mutex> lk(low_level_mutex); // 3
+
+int low_level_func(){
+	std::lock_guard<hierarchical_mutex> lk(low_level_mutex);
 	return do_low_level_stuff();
 }
-void high_level_stuff(int some_param);
-void high_level_func()
-{
-	std::lock_guard<hierarchical_mutex> lk(high_level_mutex); // 4
-	high_level_stuff(low_level_func()); // 5
+
+void high_level_stuff(int param);
+
+void high_level_func(){
+	std::lock_guard<hierarchical_mutex> lk(high_level_mutex);
+	high_level_stuff(low_level_func());
 }
-void thread_a() // 6
-{
+
+void thread_a(){
 	high_level_func();
 }
-hierarchical_mutex other_mutex(100); // 7
+
+hierarchical_mutex other_mutex(100);
 void do_other_stuff();
-void other_stuff()
-{
-	high_level_func(); // 8
+
+void other_stuff(){
+	high_level_func();
 	do_other_stuff();
 }
-void thread_b() // 9
-{
-	std::lock_guard<hierarchical_mutex> lk(other_mutex); // 10
+
+void thread_b(){ //exception 
+	std::lock_guard<hierarchical_mutex> lk(other_mutex);
 	other_stuff();
 }
+
+//使用 unique_lock重写swap
+void swap(some_big_object &l,some_big_object & r);
+class X_unique{
+private:
+	some_big_object detail;
+	std::mutex m;
+public:
+	X_unique(some_big_object const& sd):detail(sd){}
+	friend void swap(X_unique& l,X_unique& r){
+		if(&l==&r){
+			return ;
+		}
+		std::unique_lock<std::mutex> lock_a(l.m,std::defer_lock);
+		std::unique_lock<std::mutex> lock_b(r.m,std::defer_lock);
+		std::lock(lock_a,lock_b);
+		swap(r.detail,l.detail);
+	}
+};

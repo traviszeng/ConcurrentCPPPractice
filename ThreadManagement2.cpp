@@ -1,6 +1,7 @@
 #include<iostream>
 #include<thread>
 #include<vector>
+#include<functional>
 #include<algorithm>
 using namespace std;
 class task{
@@ -162,7 +163,7 @@ void some_core_part_of_algorithm()
 }
 
 
-
+/*
 int main(){
 	//std::thread::id master_thread = std::this_thread::get_id();
 	some_core_part_of_algorithm();
@@ -179,3 +180,4 @@ int main(){
 	//std::terminate();
 	//t1 = std::move(t3); // 6 赋值操作将使程序崩溃 不可通过赋新值来抛弃一个进程
 }
+*/

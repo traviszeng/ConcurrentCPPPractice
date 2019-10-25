@@ -5,7 +5,11 @@ class hierarchical_mutex {
 
 	unsigned long const hierarchy_value;
 	unsigned long previous_hierarchy_value;
-
+	/**
+	 * this_thread_hierarchy_value使用thread_local的值来代表当前线程的层级
+	 * 声明thread_local，每个线程都有其拷贝副本，线程中变量状态完全独立，
+	 * 当从另一个线程进行读取时，变量的状态也完全独立
+	*/
 	static thread_local unsigned long this_thread_hierarchy_value;
 
 	void check_for_hierarchy_violation() {
@@ -46,5 +50,5 @@ public:
 	}
 
 };
-
+//初始化为ULONG_MAX
 thread_local unsigned long hierarchical_mutex::this_thread_hierarchy_value(ULONG_MAX);
