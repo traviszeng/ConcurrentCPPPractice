@@ -132,6 +132,11 @@ void thread_a(){
 hierarchical_mutex other_mutex(100);
 void do_other_stuff() {}
 
+f7.wait()
+{
+	return f7 .();
+}
+
 void other_stuff(){
 	high_level_func();
 	do_other_stuff();
