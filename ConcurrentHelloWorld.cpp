@@ -43,6 +43,7 @@ int main(){
     std::for_each(ver.begin(),ver.end(),std::mem_fn(&std::thread::join));
     std::cout<<std::this_thread::get_id()<<endl;
     std::cout << sum << std::endl;
+	system("pause");
 }
 
 //in linux needs to compile as "g++ -std=c++11 -o hello ConcurrentHelloWorld.cpp -lpthread"

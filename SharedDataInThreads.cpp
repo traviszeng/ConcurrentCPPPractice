@@ -46,7 +46,7 @@ class some_data
 	int a;
 	std::string b;
 public:
-	void do_something();
+	void do_something() {}
 };
 
 class data_wrapper
@@ -109,14 +109,16 @@ public:
 hierarchical_mutex high_level_mutex(10000);
 hierarchical_mutex low_level_mutex(5000);
 
-int do_low_level_stuff();
+int do_low_level_stuff() {
+	return 0;
+}
 
 int low_level_func(){
 	std::lock_guard<hierarchical_mutex> lk(low_level_mutex);
 	return do_low_level_stuff();
 }
 
-void high_level_stuff(int param);
+void high_level_stuff(int param) {}
 
 void high_level_func(){
 	std::lock_guard<hierarchical_mutex> lk(high_level_mutex);
@@ -128,7 +130,7 @@ void thread_a(){
 }
 
 hierarchical_mutex other_mutex(100);
-void do_other_stuff();
+void do_other_stuff() {}
 
 void other_stuff(){
 	high_level_func();
@@ -141,7 +143,7 @@ void thread_b(){ //exception
 }
 
 // π”√ unique_lock÷ÿ–¥swap
-void swap(some_big_object &l,some_big_object & r);
+void swap(some_big_object &l, some_big_object & r) {}
 class X_unique{
 private:
 	some_big_object detail;
