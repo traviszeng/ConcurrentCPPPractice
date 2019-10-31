@@ -1,4 +1,5 @@
 #pragma once
+/**使用条件变量实现的线程安全队列*/
 /**
 1. 对整个队列的状态进行查询(empty()和size());
 2.查询在队列中的各个元素(front()和back())；
@@ -43,7 +44,7 @@ public:
 		if (data_queue.empty()) {
 			return false;
 		}
-		value = data_queue.front();
+		value = std::move(data_queue.front());
 		data_queue.pop();
 		return true;
 	} 
@@ -53,7 +54,8 @@ public:
 		if (data_queue.empty()) {
 			return shared_ptr<T>();
 		}
-		shared_ptr<T> ptr(std::make_shared<T>(data_queue.front()));
+		std::shared_ptr<T> res(
+			std::make_shared<T>(std::move(data_queue.front())));
 		data_queue.pop();
 		return ptr;
 	} 
@@ -61,14 +63,27 @@ public:
 	void wait_and_pop(T& value) {
 		unique_lock<mutex> lk(mut);
 		data_cond.wait(lk, [this] {return !data_queue.empty(); });
-		value = data_queue.front();
+		value = std::move(data_queue.front());
 		data_queue.pop();
 	}
-
-	std::shared_ptr<T> wait_and_pop() {
+	/**
+		若得到notify_one的线程在wait_and_pop中抛出异常，则其他线程将继续休眠，无法再次得到notify
+		方案一：
+			当这种情况是不可接受时，这里的调用就需要改成
+			data_cond.notify_all()，这个函数将唤醒所有的工作线程，不过，当大多线程发现队列依旧是
+			空时，又会耗费很多资源让线程重新进入睡眠状态。
+		方案二：
+			当有异常抛出的时候，让wait_and_pop()函数调用notify_one()，从而让个另一个线程可以去尝试索引存储的值。
+		方案三：
+			将 std::shared_ptr<> 的初始化过程移到push()中，并且存储 std::shared_ptr<> 实例，而非直接使用数据的值。
+			将 std::shared_ptr<> 拷贝到内部 std::queue<> 中，就不会抛出异常了，这样wait_and_pop()又是安全的了。
+		使用方案三进行改进间THREADSAFE_QUEUE_v2.h
+	*/
+	std::shared_ptr<T> wait_and_pop() { 
 		unique_lock<mutex> lk(mut);
 		data_cond.wait(lk, [this] {return !data_queue.empty(); });
-		std::shared_ptr<T> res(std::make_shared<T>(data_queue.front()));
+		std::shared_ptr<T> res(
+			std::make_shared<T>(std::move(data_queue.front())));
 		data_queue.pop();
 		return res;
 	}

@@ -28,12 +28,12 @@ public:
 
 	void push(T new_value) {
 		std::lock_guard<std::mutex> guard;
-		data.push(new_value);
+		data.push(std::move(new_value)); //std::stack保证data.push的调用安全
 	}
 	//返回一个指向弹出元素的指针，而不是直接返回值
 	//栈为空的时候pop函数抛出一个empty_stack异常
 	std::shared_ptr<T> pop() {
-		std::lock_guard<std::mutex> guard;
+		std::lock_guard<std::mutex> lock(m);
 		if (data.empty()) throw empty_stack();//调用pop前，先检查栈是否为空
 
 		std::shared_ptr<T> const res(std::make_shared<T>(data.top())); //修改堆栈前，分配出返回值
