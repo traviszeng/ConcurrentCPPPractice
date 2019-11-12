@@ -3,7 +3,7 @@
 #include<queue>
 using namespace std;
 
-//Ê¹ÓÃ std::condition_variable ´¦ÀíÊı¾İµÈ´ı
+//ä½¿ç”¨ std::condition_variable å¤„ç†æ•°æ®ç­‰å¾…
 class data_chunk {};
 mutex mu;
 queue<data_chunk> data_queue;
@@ -15,21 +15,21 @@ void data_preparation_thread() {
 		lock_guard<mutex> lk(mu);
 		
 		data_queue.push(data);
-		data_cond.notify_one(); //¶ÔµÈ´ıµÄÏß³Ì½øĞĞÍ¨Öª£¨Èç¹ûÓĞ£©
+		data_cond.notify_one(); //å¯¹ç­‰å¾…çš„çº¿ç¨‹è¿›è¡Œé€šçŸ¥ï¼ˆå¦‚æœæœ‰ï¼‰
 	}
 }
 
 void data_processing_thread() {
 	while (true) {
 		/**
-		ÎªÊ²Ã´Ê¹ÓÃunique_lock?
-		µÈ´ıÖĞµÄÏß³Ì±ØĞëÔÚµÈ´ıÆÚ¼ä½âËø»¥³âÁ¿£¬²¢ÔÚÕâÕâÖ®ºó¶Ô»¥³âÁ¿ÔÙ´ÎÉÏËø£¬¶ø std::lock_guard Ã»ÓĞÕâÃ´Áé»î¡£(lock_guardÖ»ÓĞÔÚÎö¹¹Ê±²Å»á½âËø)
+		ä¸ºä»€ä¹ˆä½¿ç”¨unique_lock?
+		ç­‰å¾…ä¸­çš„çº¿ç¨‹å¿…é¡»åœ¨ç­‰å¾…æœŸé—´è§£é”äº’æ–¥é‡ï¼Œå¹¶åœ¨è¿™è¿™ä¹‹åå¯¹äº’æ–¥é‡å†æ¬¡ä¸Šé”ï¼Œè€Œ std::lock_guard æ²¡æœ‰è¿™ä¹ˆçµæ´»ã€‚(lock_guardåªæœ‰åœ¨ææ„æ—¶æ‰ä¼šè§£é”)
 		*/
 		unique_lock<mutex> lk(mu);
-		data_cond.wait(lk, [] {return !data_queue.empty(); });//lambda×÷ÎªµÈ´ıµÄÌõ¼ş Èô²»Âú×ãlambdaÌõ¼şÔò»á½«Ïß³ÌÖÃÓÚ×èÈû»òµÈ´ı×´Ì¬£¬wait¶Ô»¥³âËø½øĞĞ½âËø
+		data_cond.wait(lk, [] {return !data_queue.empty(); });//lambdaä½œä¸ºç­‰å¾…çš„æ¡ä»¶ è‹¥ä¸æ»¡è¶³lambdaæ¡ä»¶åˆ™ä¼šå°†çº¿ç¨‹ç½®äºé˜»å¡æˆ–ç­‰å¾…çŠ¶æ€ï¼Œwaitå¯¹äº’æ–¥é”è¿›è¡Œè§£é”
 		data_chunk data = data_queue.front();
 		data_queue.pop();
-		lk.unlock(); //ÓÃÓÚÓĞ´ı´¦Àíµ«»¹Î´´¦ÀíµÄÊı¾İ
+		lk.unlock(); //ç”¨äºæœ‰å¾…å¤„ç†ä½†è¿˜æœªå¤„ç†çš„æ•°æ®
 		process(data);
 		if (is_last_chunk(data))
 			break;
@@ -38,21 +38,21 @@ void data_processing_thread() {
 
 
 /**
-future ÊÇÒ»¸öÄÜ´ÓÆäËûµØ·½»ñÈ¡µ½Ò»¸öÖµµÄ¶ÔÏó£¬Èç¹ûÊÇÔÚ²»Í¬µÄÏß³ÌÖĞ£¬Ôò±»synchronizing properly.
+future æ˜¯ä¸€ä¸ªèƒ½ä»å…¶ä»–åœ°æ–¹è·å–åˆ°ä¸€ä¸ªå€¼çš„å¯¹è±¡ï¼Œå¦‚æœæ˜¯åœ¨ä¸åŒçš„çº¿ç¨‹ä¸­ï¼Œåˆ™è¢«synchronizing properly.
 
-std::condition_variable ¿ÉÒÔÓÃÓÚÒì²½ÊÂ¼şµÄÖØ¸´Í¨Öª£¬µ«ÊÇÓĞĞ©Ê±ºò¿ÉÄÜÖ»µÈ´ıÊÂ¼ş·¢ÉúÒ»´Î£¬±ÈÈç£ºµÈ´ıÌØ¶¨µÄº½°à£¬ÓÃÌõ¼ş±äÁ¿´óÉ±Æ÷ÓĞµãÀË·ÑÁË¡£
-C++11 ±ê×¼¿âÌá¹©ÁË¼¸ÖÖÒì²½ÈÎÎñ»úÖÆ¡£Í¨³£ thread ²»ÄÜ·µ»ØÏß³ÌÖ´ĞĞµÄ½á¹û(¿ÉÒÔÍ¨¹ıÒıÓÃ²ÎÊı·µ»Ø)£¬¶øÔÚÒì²½´¦Àíµ±ÖĞºÜ¶àÊ±ºò¶¼ĞèÒª»ñµÃ¼ÆËãµÄ½á¹û¡£
-Èç¹ûÖ»»ñÈ¡½á¹ûÒ»´ÎÄÇÃ´Ñ¡ÓÃ future£¬¼´Í¨¹ı future »ñÈ¡ÁË½á¹ûºó£¬ºóĞøÔÙÍ¨¹ı´Ë future »ñÈ¡½á¹û½«»á³ö´í¡£
+std::condition_variable å¯ä»¥ç”¨äºå¼‚æ­¥äº‹ä»¶çš„é‡å¤é€šçŸ¥ï¼Œä½†æ˜¯æœ‰äº›æ—¶å€™å¯èƒ½åªç­‰å¾…äº‹ä»¶å‘ç”Ÿä¸€æ¬¡ï¼Œæ¯”å¦‚ï¼šç­‰å¾…ç‰¹å®šçš„èˆªç­ï¼Œç”¨æ¡ä»¶å˜é‡å¤§æ€å™¨æœ‰ç‚¹æµªè´¹äº†ã€‚
+C++11 æ ‡å‡†åº“æä¾›äº†å‡ ç§å¼‚æ­¥ä»»åŠ¡æœºåˆ¶ã€‚é€šå¸¸ thread ä¸èƒ½è¿”å›çº¿ç¨‹æ‰§è¡Œçš„ç»“æœ(å¯ä»¥é€šè¿‡å¼•ç”¨å‚æ•°è¿”å›)ï¼Œè€Œåœ¨å¼‚æ­¥å¤„ç†å½“ä¸­å¾ˆå¤šæ—¶å€™éƒ½éœ€è¦è·å¾—è®¡ç®—çš„ç»“æœã€‚
+å¦‚æœåªè·å–ç»“æœä¸€æ¬¡é‚£ä¹ˆé€‰ç”¨ futureï¼Œå³é€šè¿‡ future è·å–äº†ç»“æœåï¼Œåç»­å†é€šè¿‡æ­¤ future è·å–ç»“æœå°†ä¼šå‡ºé”™ã€‚
 */
 /**
-std::future¿ÉÓÃÓÚÒì²½ÈÎÎñÖĞ»ñÈ¡ÈÎÎñ½á¹û£¬µ«ÊÇËüÖ»ÊÇ»ñÈ¡½á¹û¶øÒÑ£¬ÕæÕıµÄÒì²½µ÷ÓÃĞèÒªÅäºÏ std::async, std::promise, std::packaged_task¡£
-ÕâÀï async ÊÇ¸öÄ£°åº¯Êı£¬promise ºÍ packaged_task ÊÇÄ£°åÀà£¬Í¨³£Ä£°åÊµÀı»¯²ÎÊıÊÇÈÎÎñº¯Êı(callable object)¡£
+std::futureå¯ç”¨äºå¼‚æ­¥ä»»åŠ¡ä¸­è·å–ä»»åŠ¡ç»“æœï¼Œä½†æ˜¯å®ƒåªæ˜¯è·å–ç»“æœè€Œå·²ï¼ŒçœŸæ­£çš„å¼‚æ­¥è°ƒç”¨éœ€è¦é…åˆ std::async, std::promise, std::packaged_taskã€‚
+è¿™é‡Œ async æ˜¯ä¸ªæ¨¡æ¿å‡½æ•°ï¼Œpromise å’Œ packaged_task æ˜¯æ¨¡æ¿ç±»ï¼Œé€šå¸¸æ¨¡æ¿å®ä¾‹åŒ–å‚æ•°æ˜¯ä»»åŠ¡å‡½æ•°(callable object)ã€‚
 */
 
-//async + future»ù±¾ÓÃ·¨
+//async + futureåŸºæœ¬ç”¨æ³•
 int task(int a) { return 10; }
-//futrue µÄÊ¹ÓÃĞÎÊ½£ºfuture<int> myFuture=async(task,10) 
-//async µÄĞ§¹ûÊÇ£º×Ô¶¯´´½¨Ò»¸öºóÌ¨Ïß³Ì(¿ÉÒÔÑ¡È¡Ò»¸ö¿ÕÏĞµÄÏß³Ì), ½«À´»áÔÚÄ³Ò»Ê±¿ÌÖ´ĞĞÈÎÎñ task º¯Êı£¬²¢½«¼ÆËã½á¹û±£´æÔÚ myFuture ÖĞ
+//futrue çš„ä½¿ç”¨å½¢å¼ï¼šfuture<int> myFuture=async(task,10) 
+//async çš„æ•ˆæœæ˜¯ï¼šè‡ªåŠ¨åˆ›å»ºä¸€ä¸ªåå°çº¿ç¨‹(å¯ä»¥é€‰å–ä¸€ä¸ªç©ºé—²çš„çº¿ç¨‹), å°†æ¥ä¼šåœ¨æŸä¸€æ—¶åˆ»æ‰§è¡Œä»»åŠ¡ task å‡½æ•°ï¼Œå¹¶å°†è®¡ç®—ç»“æœä¿å­˜åœ¨ myFuture ä¸­
 // future::operator=
 #include <iostream>       // std::cout
 #include <future>         // std::async, std::future
@@ -61,12 +61,12 @@ int get_value() { return 10; }
 
 int main()
 {
-	std::future<int> fut;           // default-constructed, Ä¬ÈÏ¹¹ÔìµÄ future ¶ÔÏóÊÇÎŞĞ§µÄ
+	std::future<int> fut;           // default-constructed, é»˜è®¤æ„é€ çš„ future å¯¹è±¡æ˜¯æ— æ•ˆçš„
 
-  // async()·µ»ØµÄ¾ÍÊÇÒ»¸ö uture ¶ÔÏó¡£ fut = future_returned_by_async(), µ÷ÓÃ future µÄ¸³ÖµÔËËã·û¡£
-  // move-assigned£¬¸³ÖµÔËËã·ûÒşÊ½Ê¹ÓÃµÄÊÇ move ÓïÒâ(·Çc++98µÄ¿½±´ÓïÒâ)£¬ fut = ÕâÊ¹µÃ fut ±äµÄÓĞĞ§¡£Í¬Ê±Ê¹µÃÓÒ²Ù×÷Êı±äµÄÎŞĞ§
+  // async()è¿”å›çš„å°±æ˜¯ä¸€ä¸ª uture å¯¹è±¡ã€‚ fut = future_returned_by_async(), è°ƒç”¨ future çš„èµ‹å€¼è¿ç®—ç¬¦ã€‚
+  // move-assignedï¼Œèµ‹å€¼è¿ç®—ç¬¦éšå¼ä½¿ç”¨çš„æ˜¯ move è¯­æ„(éc++98çš„æ‹·è´è¯­æ„)ï¼Œ fut = è¿™ä½¿å¾— fut å˜çš„æœ‰æ•ˆã€‚åŒæ—¶ä½¿å¾—å³æ“ä½œæ•°å˜çš„æ— æ•ˆ
 	fut = std::async(get_value);
-	//async´´½¨²¢ÔËĞĞÒ»¸öÏß³Ì£¬·µ»ØÒ»¸öÓëº¯Êı·µ»ØÖµÏà¶ÔÓ¦ÀàĞÍµÄ future£¬Í¨¹ıËüÎÒÃÇ¿ÉÒÔÔÚÆäËûÈÎºÎµØ·½»ñÈ¡Òì²½½á¹û
+	//asyncåˆ›å»ºå¹¶è¿è¡Œä¸€ä¸ªçº¿ç¨‹ï¼Œè¿”å›ä¸€ä¸ªä¸å‡½æ•°è¿”å›å€¼ç›¸å¯¹åº”ç±»å‹çš„ futureï¼Œé€šè¿‡å®ƒæˆ‘ä»¬å¯ä»¥åœ¨å…¶ä»–ä»»ä½•åœ°æ–¹è·å–å¼‚æ­¥ç»“æœ
 
 	//Calling future::get on a valid future blocks the thread until the provider makes the shared state ready return 0;
 	std::cout << "value: " << fut.get() << '\n';
@@ -74,17 +74,17 @@ int main()
 
 //packaged_task + future
 /**
-packaged_task ÓÃÀ´°ü¹üÒ»¸ö¿Éµ÷ÓÃµÄ¶ÔÏó(°üÀ¨º¯Êı£¬º¯ÊıÖ¸Õë£¬º¯Êı¶ÔÏó/·Âº¯Êı£¬³ÉÔ±º¯ÊıµÈ)
+packaged_task ç”¨æ¥åŒ…è£¹ä¸€ä¸ªå¯è°ƒç”¨çš„å¯¹è±¡(åŒ…æ‹¬å‡½æ•°ï¼Œå‡½æ•°æŒ‡é’ˆï¼Œå‡½æ•°å¯¹è±¡/ä»¿å‡½æ•°ï¼Œæˆå‘˜å‡½æ•°ç­‰)
 */
 packaged_task<int(int)> myPackaged(task);
-//Ê×ÏÈ´´½¨packaged_task¶ÔÏómyPackaged£¬ÆäÄÚ²¿´´½¨Ò»¸öº¯ÊıtaskºÍÒ»¸ö¹²Ïí×´Ì¬(ÓÃÓÚ·µ»ØtaskµÄ½á¹û)  
+//é¦–å…ˆåˆ›å»ºpackaged_taskå¯¹è±¡myPackagedï¼Œå…¶å†…éƒ¨åˆ›å»ºä¸€ä¸ªå‡½æ•°taskå’Œä¸€ä¸ªå…±äº«çŠ¶æ€(ç”¨äºè¿”å›taskçš„ç»“æœ)  
 future<int> myFuture = myPackaged.get_future();
-//Í¨¹ı packaged_task::get_future() ·µ»ØÒ»¸öfuture¶ÔÏómyFutureÓÃÓÚ»ñÈ¡taskµÄÈÎÎñ½á¹û  
+//é€šè¿‡ packaged_task::get_future() è¿”å›ä¸€ä¸ªfutureå¯¹è±¡myFutureç”¨äºè·å–taskçš„ä»»åŠ¡ç»“æœ  
 thread myThread(move(myPackaged), "hello world");
-//´´½¨Ò»¸öÏß³ÌÖ´ĞĞtaskÈÎÎñ£¬ÕâÀï×¢ÒâmoveÓïÒåÇ¿ÖÆ½«×óÖµ×ªÎªÓÒÖµÊ¹ÓÃÒòÎªpackaged_task½ûÖ¹copy constructor£¬¿ÉÒÔ²»´´½¨Ïß³Ì£¬ÄÇÃ´taskÈÎÎñµÄÖ´ĞĞ½«ºÍfuture½á¹ûµÄ»ñÈ¡ÔÚÍ¬Ò»¸öÏß³Ì£¬ÕâÑù¾Í²»½ĞÒì²½ÁË  
-//ÕâÀïÖ÷Ïß³Ì¿ÉÒÔ×öÆäËüµÄ²Ù×÷  
+//åˆ›å»ºä¸€ä¸ªçº¿ç¨‹æ‰§è¡Œtaskä»»åŠ¡ï¼Œè¿™é‡Œæ³¨æ„moveè¯­ä¹‰å¼ºåˆ¶å°†å·¦å€¼è½¬ä¸ºå³å€¼ä½¿ç”¨å› ä¸ºpackaged_taskç¦æ­¢copy constructorï¼Œå¯ä»¥ä¸åˆ›å»ºçº¿ç¨‹ï¼Œé‚£ä¹ˆtaskä»»åŠ¡çš„æ‰§è¡Œå°†å’Œfutureç»“æœçš„è·å–åœ¨åŒä¸€ä¸ªçº¿ç¨‹ï¼Œè¿™æ ·å°±ä¸å«å¼‚æ­¥äº†  
+//è¿™é‡Œä¸»çº¿ç¨‹å¯ä»¥åšå…¶å®ƒçš„æ“ä½œ  
 int x = myFuture.get();
-//Ïß³Ì»¹¿ÉÒÔÔÚÖ´ĞĞÒ»Ğ©ÆäËü²Ù×÷£¬Ö±µ½ÆäÏë»ñÈ¡taskµÄ½á¹ûÊ±µ÷ÓÃ´ËÓï¾ä
+//çº¿ç¨‹è¿˜å¯ä»¥åœ¨æ‰§è¡Œä¸€äº›å…¶å®ƒæ“ä½œï¼Œç›´åˆ°å…¶æƒ³è·å–taskçš„ç»“æœæ—¶è°ƒç”¨æ­¤è¯­å¥
 
 //promise + future
 #include <iostream>       // std::cout  
@@ -93,35 +93,35 @@ int x = myFuture.get();
 #include <future>         // std::promise, std::future  
 
 void print_int(std::future<int>& fut) {
-	int x = fut.get();//µ±promise::set_value()ÉèÖÃÁËpromiseµÄ¹²Ïí×´Ì¬Öµºó£¬
-	// fut½«»áÍ¨¹ıfuture::get()»ñµÃ¸Ã¹²Ïí×´Ì¬Öµ£¬ÈôpromiseÃ»ÓĞÉèÖÃ¸ÃÖµÄÇÃ´
-	// fut.get()½«»á×èÈûÏß³ÌÖ±µ½¹²Ïí×´Ì¬Öµ±»promiseÉèÖÃ  
-	std::cout << "value: " << x << '\n';//Êä³ö£º<span style="font-family: monospace; white-space: pre; rgb(231, 231, 231);">value: 10</span>  
+	int x = fut.get();//å½“promise::set_value()è®¾ç½®äº†promiseçš„å…±äº«çŠ¶æ€å€¼åï¼Œ
+	// futå°†ä¼šé€šè¿‡future::get()è·å¾—è¯¥å…±äº«çŠ¶æ€å€¼ï¼Œè‹¥promiseæ²¡æœ‰è®¾ç½®è¯¥å€¼é‚£ä¹ˆ
+	// fut.get()å°†ä¼šé˜»å¡çº¿ç¨‹ç›´åˆ°å…±äº«çŠ¶æ€å€¼è¢«promiseè®¾ç½®  
+	std::cout << "value: " << x << '\n';//è¾“å‡ºï¼š<span style="font-family: monospace; white-space: pre; rgb(231, 231, 231);">value: 10</span>  
 }
 
 int main()
 {
-	std::promise<int> prom; //´´½¨Ò»¸öpromise¶ÔÏó  
-	std::future<int> fut = prom.get_future(); //»ñÈ¡promiseÄÚ²¿µÄfuture£¬fut½«ºÍpromise¹²ÏípromiseÖĞµÄ¹²Ïí×´Ì¬£¬
-	// ¸Ã¹²Ïí×´Ì¬ÓÃÓÚ·µ»Ø¼ÆËã½á¹û  
-	std::thread th1(print_int, std::ref(fut));  //´´½¨Ò»¸öÏß³Ì£¬²¢Í¨¹ıÒıÓÃ·½Ê½½«fut´«µ½print_intÖĞ  
-	prom.set_value(10);    //ÉèÖÃ¹²Ïí×´Ì¬Öµ  
+	std::promise<int> prom; //åˆ›å»ºä¸€ä¸ªpromiseå¯¹è±¡  
+	std::future<int> fut = prom.get_future(); //è·å–promiseå†…éƒ¨çš„futureï¼Œfutå°†å’Œpromiseå…±äº«promiseä¸­çš„å…±äº«çŠ¶æ€ï¼Œ
+	// è¯¥å…±äº«çŠ¶æ€ç”¨äºè¿”å›è®¡ç®—ç»“æœ  
+	std::thread th1(print_int, std::ref(fut));  //åˆ›å»ºä¸€ä¸ªçº¿ç¨‹ï¼Œå¹¶é€šè¿‡å¼•ç”¨æ–¹å¼å°†futä¼ åˆ°print_intä¸­  
+	prom.set_value(10);    //è®¾ç½®å…±äº«çŠ¶æ€å€¼  
 												 //  
-	th1.join();//µÈ´ı×ÓÏß³Ì  
+	th1.join();//ç­‰å¾…å­çº¿ç¨‹  
 	return 0;
 }
 /**
-½«Ö÷Ïß³Ì¼´ĞèÒª task ½á¹ûµÄÏß³Ì³ÆÎª provider£¬³ÆÖ´ĞĞÈÎÎñ task »òÉÏÃæ print_int µÄÏß³ÌÎª executor (ÕâÀïÖ»ÊÇÎªÁËºóÃæ±íÊö·½±ã£¬Ã»ÓĞ¿ÆÑ§¿¼Ö¤µÄ)¡£´ÓÉÏÃæµÄÀı×Ó¿ÉÒÔ¿´³ö£¬¼òµ¥µÄÍ¬²½»úÖÆ¶¼ÊÇÍ¨¹ıÉèÖÃÄ³ÖÖ¹²Ïí×´Ì¬È»ºóÍ¨¹ı future »ñÈ¡¸Ã¹²Ïí×´Ì¬´ïµ½Í¬²½
+å°†ä¸»çº¿ç¨‹å³éœ€è¦ task ç»“æœçš„çº¿ç¨‹ç§°ä¸º providerï¼Œç§°æ‰§è¡Œä»»åŠ¡ task æˆ–ä¸Šé¢ print_int çš„çº¿ç¨‹ä¸º executor (è¿™é‡Œåªæ˜¯ä¸ºäº†åé¢è¡¨è¿°æ–¹ä¾¿ï¼Œæ²¡æœ‰ç§‘å­¦è€ƒè¯çš„)ã€‚ä»ä¸Šé¢çš„ä¾‹å­å¯ä»¥çœ‹å‡ºï¼Œç®€å•çš„åŒæ­¥æœºåˆ¶éƒ½æ˜¯é€šè¿‡è®¾ç½®æŸç§å…±äº«çŠ¶æ€ç„¶åé€šè¿‡ future è·å–è¯¥å…±äº«çŠ¶æ€è¾¾åˆ°åŒæ­¥
 
-¡¡¡¡async Í¨¹ı´´½¨»òÕßÑ¡È¡Ò»¸öµ±Ç°¿ÕÏĞÏß³ÌÖ´ĞĞÈÎÎñ£¬È»ºó½«¼ÆËã½á¹û±£´æÖÁÓë´Ë async Ïà¹ØµÄ future ÖĞ£¬ÆÚ¼äÖ»ÓĞ´æÈ¡½á¹ûÖµ£¬Ã»ÓĞÆäËüµÄ½»»¥£¬²¢ÇÒÊÇ provider ³ÖÓĞfuture£¬executor Ö´ĞĞÈÎÎñ
+ã€€ã€€async é€šè¿‡åˆ›å»ºæˆ–è€…é€‰å–ä¸€ä¸ªå½“å‰ç©ºé—²çº¿ç¨‹æ‰§è¡Œä»»åŠ¡ï¼Œç„¶åå°†è®¡ç®—ç»“æœä¿å­˜è‡³ä¸æ­¤ async ç›¸å…³çš„ future ä¸­ï¼ŒæœŸé—´åªæœ‰å­˜å–ç»“æœå€¼ï¼Œæ²¡æœ‰å…¶å®ƒçš„äº¤äº’ï¼Œå¹¶ä¸”æ˜¯ provider æŒæœ‰futureï¼Œexecutor æ‰§è¡Œä»»åŠ¡
 
-¡¡¡¡packaged_task ÊÇÒ»¸ö¶ÔÏóÆäÄÚ²¿³ÖÓĞ callable object£¬provider ´´½¨Ò»¸öÏÂÏß³Ì executor Ö´ĞĞÈÎÎñ£¬×îºó provider Í¨¹ıÏà¹ØµÄ future »ñÈ¡ÈÎÎñ¼ÆËã½á¹û¡£ºÍ async ²î²»¶à¡£Ö»ÓĞÈÎÎñ½á¹ûµÄ´æÈ¡£¬Ã»ÓĞÆäËü½»»¥
+ã€€ã€€packaged_task æ˜¯ä¸€ä¸ªå¯¹è±¡å…¶å†…éƒ¨æŒæœ‰ callable objectï¼Œprovider åˆ›å»ºä¸€ä¸ªä¸‹çº¿ç¨‹ executor æ‰§è¡Œä»»åŠ¡ï¼Œæœ€å provider é€šè¿‡ç›¸å…³çš„ future è·å–ä»»åŠ¡è®¡ç®—ç»“æœã€‚å’Œ async å·®ä¸å¤šã€‚åªæœ‰ä»»åŠ¡ç»“æœçš„å­˜å–ï¼Œæ²¡æœ‰å…¶å®ƒäº¤äº’
 
-¡¡¡¡promise ÊÇ provider ³ÖÓĞ£¬executor ³ÖÓĞÏà¹ØµÄ future£¬È»ºó provider Í¨¹ı promise Éè¶¨¹²Ïí×´Ì¬µÄÖµ£¬future »ñÈ¡¸Ã¹²ÏíÖµºóÖ´ĞĞÄ³Ğ©ÈÎÎñ¡£
+ã€€ã€€promise æ˜¯ provider æŒæœ‰ï¼Œexecutor æŒæœ‰ç›¸å…³çš„ futureï¼Œç„¶å provider é€šè¿‡ promise è®¾å®šå…±äº«çŠ¶æ€çš„å€¼ï¼Œfuture è·å–è¯¥å…±äº«å€¼åæ‰§è¡ŒæŸäº›ä»»åŠ¡ã€‚
 */
 
 
-//Ê¹ÓÃ std::future ´ÓÒì²½ÈÎÎñÖĞ»ñÈ¡·µ»ØÖµ
+//ä½¿ç”¨ std::future ä»å¼‚æ­¥ä»»åŠ¡ä¸­è·å–è¿”å›å€¼
 #include<future>
 #include<iostream>
 int find_the_answer_to_ltuae();
@@ -134,9 +134,9 @@ void get_return_from_async() {
 
 
 /**
-std::async ÔÊĞíÄãÍ¨¹ıÌí¼Ó¶îÍâµÄµ÷ÓÃ²ÎÊı£¬Ïòº¯Êı´«µİ¶îÍâµÄ²ÎÊı¡£
-µ±µÚÒ»¸ö²ÎÊıÊÇÒ»¸öÖ¸Ïò³ÉÔ±º¯ÊıµÄÖ¸Õë£¬µÚ¶ş¸ö²ÎÊıÌá¹©ÓĞÕâ¸öº¯Êı³ÉÔ±ÀàµÄ¾ßÌå¶ÔÏó(²»ÊÇÖ±½ÓµÄ£¬¾ÍÊÇÍ¨¹ıÖ¸Õë£¬»¹¿ÉÒÔ°ü×°ÔÚ std::ref ÖĞ)£¬Ê£ÓàµÄ²ÎÊı¿É×÷Îª³ÉÔ±º¯ÊıµÄ²ÎÊı´«Èë¡£
-·ñÔò£¬µÚ¶ş¸öºÍËæºóµÄ²ÎÊı½«×÷Îªº¯ÊıµÄ²ÎÊı£¬»ò×÷ÎªÖ¸¶¨¿Éµ÷ÓÃ¶ÔÏóµÄµÚÒ»¸ö²ÎÊı¡£
+std::async å…è®¸ä½ é€šè¿‡æ·»åŠ é¢å¤–çš„è°ƒç”¨å‚æ•°ï¼Œå‘å‡½æ•°ä¼ é€’é¢å¤–çš„å‚æ•°ã€‚
+å½“ç¬¬ä¸€ä¸ªå‚æ•°æ˜¯ä¸€ä¸ªæŒ‡å‘æˆå‘˜å‡½æ•°çš„æŒ‡é’ˆï¼Œç¬¬äºŒä¸ªå‚æ•°æä¾›æœ‰è¿™ä¸ªå‡½æ•°æˆå‘˜ç±»çš„å…·ä½“å¯¹è±¡(ä¸æ˜¯ç›´æ¥çš„ï¼Œå°±æ˜¯é€šè¿‡æŒ‡é’ˆï¼Œè¿˜å¯ä»¥åŒ…è£…åœ¨ std::ref ä¸­)ï¼Œå‰©ä½™çš„å‚æ•°å¯ä½œä¸ºæˆå‘˜å‡½æ•°çš„å‚æ•°ä¼ å…¥ã€‚
+å¦åˆ™ï¼Œç¬¬äºŒä¸ªå’Œéšåçš„å‚æ•°å°†ä½œä¸ºå‡½æ•°çš„å‚æ•°ï¼Œæˆ–ä½œä¸ºæŒ‡å®šå¯è°ƒç”¨å¯¹è±¡çš„ç¬¬ä¸€ä¸ªå‚æ•°ã€‚
 */
 #include<string>
 struct X {
@@ -145,8 +145,8 @@ struct X {
 };
 
 X x;
-auto f1 = std::async(&X::foo, &x, 42, "hello"); // µ÷ÓÃp->foo(42, "hello")£¬pÊÇÖ¸ÏòxµÄÖ¸Õë
-auto f2 = std::async(&X::bar, x, "goodbye"); // µ÷ÓÃtmpx.bar("goodbye")£¬ tmpxÊÇxµÄ¿½±´¸±±¾
+auto f1 = std::async(&X::foo, &x, 42, "hello"); // è°ƒç”¨p->foo(42, "hello")ï¼Œpæ˜¯æŒ‡å‘xçš„æŒ‡é’ˆ
+auto f2 = std::async(&X::bar, x, "goodbye"); // è°ƒç”¨tmpx.bar("goodbye")ï¼Œ tmpxæ˜¯xçš„æ‹·è´å‰¯æœ¬
 
 struct Y
 {
@@ -154,11 +154,11 @@ struct Y
 };
 Y y;
 
-auto f3 = std::async(Y(), 3.141); // µ÷ÓÃtmpy(3.141)£¬tmpyÍ¨¹ıYµÄÒÆ¶¯¹¹Ôìº¯ÊıµÃµ½
-auto f4 = std::async(std::ref(y), 2.718); // µ÷ÓÃy(2.718)
+auto f3 = std::async(Y(), 3.141); // è°ƒç”¨tmpy(3.141)ï¼Œtmpyé€šè¿‡Yçš„ç§»åŠ¨æ„é€ å‡½æ•°å¾—åˆ°
+auto f4 = std::async(std::ref(y), 2.718); // è°ƒç”¨y(2.718)
 
 X baz(X&);
-auto f6 = std::async(baz, std::ref(x)); // µ÷ÓÃbaz(x)
+auto f6 = std::async(baz, std::ref(x)); // è°ƒç”¨baz(x)
 class move_only
 {
 public:
@@ -169,26 +169,26 @@ public:
 	move_only& operator=(move_only const&) = delete;
 	void operator()();
 };
-auto f5 = std::async(move_only());//µ÷ÓÃtmp()£¬ÆäÖĞtmpÊÇ´Óstd::move(move_only())¹¹ÔìµÄ
+auto f5 = std::async(move_only());//è°ƒç”¨tmp()ï¼Œå…¶ä¸­tmpæ˜¯ä»std::move(move_only())æ„é€ çš„
 
 /**
-ÔÚÄ¬ÈÏÇé¿öÏÂ£¬ÕâÈ¡¾öÓÚ std::async ÊÇ·ñÆô¶¯Ò»¸öÏß³Ì£¬»òÊÇ·ñÔÚÆÚÍûµÈ´ıÊ±Í¬²½ÈÎÎñ¡£ÔÚ
-´ó¶àÊıÇé¿öÏÂ(¹À¼ÆÕâ¾ÍÊÇÄãÏëÒªµÄ½á¹û)£¬µ«ÊÇÄãÒ²¿ÉÒÔÔÚº¯Êıµ÷ÓÃÖ®Ç°£¬Ïò std::async ´«
-µİÒ»¸ö¶îÍâ²ÎÊı¡£Õâ¸ö²ÎÊıµÄÀàĞÍÊÇ std::launch £¬»¹¿ÉÒÔÊÇ std::launch::defered £¬ÓÃÀ´±í
-Ã÷º¯Êıµ÷ÓÃ±»ÑÓ³Ùµ½wait()»òget()º¯Êıµ÷ÓÃÊ±²ÅÖ´ĞĞ£¬ std::launch::async ±íÃ÷º¯Êı±ØĞëÔÚÆä
-ËùÔÚµÄ¶ÀÁ¢Ïß³ÌÉÏÖ´ĞĞ£¬ std::launch::deferred | std::launch::async ±íÃ÷ÊµÏÖ¿ÉÒÔÑ¡ÔñÕâÁ½
-ÖÖ·½Ê½µÄÒ»ÖÖ¡£×îºóÒ»¸öÑ¡ÏîÊÇÄ¬ÈÏµÄ¡£µ±º¯Êıµ÷ÓÃ±»ÑÓ³Ù£¬Ëü¿ÉÄÜ²»»áÔÚÔËĞĞÁË¡£
+åœ¨é»˜è®¤æƒ…å†µä¸‹ï¼Œè¿™å–å†³äº std::async æ˜¯å¦å¯åŠ¨ä¸€ä¸ªçº¿ç¨‹ï¼Œæˆ–æ˜¯å¦åœ¨æœŸæœ›ç­‰å¾…æ—¶åŒæ­¥ä»»åŠ¡ã€‚åœ¨
+å¤§å¤šæ•°æƒ…å†µä¸‹(ä¼°è®¡è¿™å°±æ˜¯ä½ æƒ³è¦çš„ç»“æœ)ï¼Œä½†æ˜¯ä½ ä¹Ÿå¯ä»¥åœ¨å‡½æ•°è°ƒç”¨ä¹‹å‰ï¼Œå‘ std::async ä¼ 
+é€’ä¸€ä¸ªé¢å¤–å‚æ•°ã€‚è¿™ä¸ªå‚æ•°çš„ç±»å‹æ˜¯ std::launch ï¼Œè¿˜å¯ä»¥æ˜¯ std::launch::defered ï¼Œç”¨æ¥è¡¨
+æ˜å‡½æ•°è°ƒç”¨è¢«å»¶è¿Ÿåˆ°wait()æˆ–get()å‡½æ•°è°ƒç”¨æ—¶æ‰æ‰§è¡Œï¼Œ std::launch::async è¡¨æ˜å‡½æ•°å¿…é¡»åœ¨å…¶
+æ‰€åœ¨çš„ç‹¬ç«‹çº¿ç¨‹ä¸Šæ‰§è¡Œï¼Œ std::launch::deferred | std::launch::async è¡¨æ˜å®ç°å¯ä»¥é€‰æ‹©è¿™ä¸¤
+ç§æ–¹å¼çš„ä¸€ç§ã€‚æœ€åä¸€ä¸ªé€‰é¡¹æ˜¯é»˜è®¤çš„ã€‚å½“å‡½æ•°è°ƒç”¨è¢«å»¶è¿Ÿï¼Œå®ƒå¯èƒ½ä¸ä¼šåœ¨è¿è¡Œäº†ã€‚
 */
-auto f6 = std::async(std::launch::async, Y(), 1.2); // ÔÚĞÂÏß³ÌÉÏÖ´ĞĞ
-auto f7 = std::async(std::launch::deferred, baz, std::ref(x)); // ÔÚwait()»òget()µ÷ÓÃÊ±Ö´ĞĞ
-auto f8 = std::async(std::launch::deferred | std::launch::async,baz, std::ref(x)); // ÊµÏÖÑ¡ÔñÖ´ĞĞ·½Ê½
+auto f6 = std::async(std::launch::async, Y(), 1.2); // åœ¨æ–°çº¿ç¨‹ä¸Šæ‰§è¡Œ
+auto f7 = std::async(std::launch::deferred, baz, std::ref(x)); // åœ¨wait()æˆ–get()è°ƒç”¨æ—¶æ‰§è¡Œ
+auto f8 = std::async(std::launch::deferred | std::launch::async,baz, std::ref(x)); // å®ç°é€‰æ‹©æ‰§è¡Œæ–¹å¼
 auto f9 = std::async(baz, std::ref(x));
-f7.wait(); // µ÷ÓÃÑÓ³Ùº¯Êı
+f7.wait(); // è°ƒç”¨å»¶è¿Ÿå‡½æ•°
 
 
 
 
-//std::packaged_task<> µÄÌØ»¯¡ª¡ª¾Ö²¿Àà¶¨Òå
+//std::packaged_task<> çš„ç‰¹åŒ–â€”â€”å±€éƒ¨ç±»å®šä¹‰
 template<>
 class packaged_task<std::string(std::vector<char>*, int)>
 {
@@ -199,69 +199,69 @@ public:
 	void operator()(std::vector<char>*, int);
 };
 
-//Ê¹ÓÃ std::packaged_task Ö´ĞĞÒ»¸öÍ¼ĞÎ½çÃæÏß³Ì
+//ä½¿ç”¨ std::packaged_task æ‰§è¡Œä¸€ä¸ªå›¾å½¢ç•Œé¢çº¿ç¨‹
 #include <deque>
 #include <mutex>
 #include <future>
 #include <thread>
 #include <utility>
 std::mutex m;
-/**std::packaged_task<void()> ´´½¨ÈÎÎñ£¬Æä°üº¬ÁËÒ»¸öÎŞ²ÎÊıÎŞ·µ»ØÖµµÄº¯Êı»ò
-¿Éµ÷ÓÃ¶ÔÏó(Èç¹ûµ±Õâ¸öµ÷ÓÃÓĞ·µ»ØÖµÊ±£¬·µ»ØÖµ»á±»¶ªÆú)¡£*/
+/**std::packaged_task<void()> åˆ›å»ºä»»åŠ¡ï¼Œå…¶åŒ…å«äº†ä¸€ä¸ªæ— å‚æ•°æ— è¿”å›å€¼çš„å‡½æ•°æˆ–
+å¯è°ƒç”¨å¯¹è±¡(å¦‚æœå½“è¿™ä¸ªè°ƒç”¨æœ‰è¿”å›å€¼æ—¶ï¼Œè¿”å›å€¼ä¼šè¢«ä¸¢å¼ƒ)ã€‚*/
 std::deque<std::packaged_task<void()> > tasks;
 bool gui_shutdown_message_received();
 void get_and_process_gui_message();
 void gui_thread() // 1
 {
-	while (!gui_shutdown_message_received()) // Î´ÊÕµ½¹Ø±ÕÍ¼ĞÎ½çÃæµÄÏûÏ¢¾Í¼ÌĞø
+	while (!gui_shutdown_message_received()) // æœªæ”¶åˆ°å…³é—­å›¾å½¢ç•Œé¢çš„æ¶ˆæ¯å°±ç»§ç»­
 	{
-		get_and_process_gui_message(); // ÂÖÑµ½çÃæÏûÏ¢´¦Àí
+		get_and_process_gui_message(); // è½®è®­ç•Œé¢æ¶ˆæ¯å¤„ç†
 		std::packaged_task<void()> task;
 		{
 			std::lock_guard<std::mutex> lk(m);
-			if (tasks.empty()) // ÈôtasksÖĞÎŞÈÎÎñ½«ÔÙ´ÎÑ­»·
+			if (tasks.empty()) // è‹¥tasksä¸­æ— ä»»åŠ¡å°†å†æ¬¡å¾ªç¯
 				continue;
-			task = std::move(tasks.front()); // ´Ó¶ÓÁĞÖĞÌáÈ¡³öÒ»¸öÈÎÎñ
+			task = std::move(tasks.front()); // ä»é˜Ÿåˆ—ä¸­æå–å‡ºä¸€ä¸ªä»»åŠ¡
 			tasks.pop_front();
 		}
-		task(); // Ö´ĞĞ¸ÃÈÎÎñ
+		task(); // æ‰§è¡Œè¯¥ä»»åŠ¡
 	}
-	//ÆÚÍûºÍÈÎÎñÏà¹Ø£¬µ±ÈÎÎñÖ´ĞĞÍê³ÉÊ±£¬×´Ì¬±»ÖÃÎª¾ÍĞ÷×´Ì¬
+	//æœŸæœ›å’Œä»»åŠ¡ç›¸å…³ï¼Œå½“ä»»åŠ¡æ‰§è¡Œå®Œæˆæ—¶ï¼ŒçŠ¶æ€è¢«ç½®ä¸ºå°±ç»ªçŠ¶æ€
 }
 std::thread gui_bg_thread(gui_thread);
 template<typename Func>
-std::future<void> post_task_for_gui_thread(Func f) //½«Ò»¸öÈÎÎñ´«Èë¶ÓÁĞ
+std::future<void> post_task_for_gui_thread(Func f) //å°†ä¸€ä¸ªä»»åŠ¡ä¼ å…¥é˜Ÿåˆ—
 {
-	std::packaged_task<void()> task(f); // Ìá¹©Ò»¸ö´ò°üºÃµÄÈÎÎñ
-	std::future<void> res = task.get_future(); // µ÷ÓÃget_future()»ñÈ¡ÆÚÍû¶ÔÏó
+	std::packaged_task<void()> task(f); // æä¾›ä¸€ä¸ªæ‰“åŒ…å¥½çš„ä»»åŠ¡
+	std::future<void> res = task.get_future(); // è°ƒç”¨get_future()è·å–æœŸæœ›å¯¹è±¡
 	std::lock_guard<std::mutex> lk(m); // 9
 	tasks.push_back(std::move(task)); // 10
 	return res;
 }
 
-//Ê¹ÓÃpromise½â¾öµ¥Ïß³Ì¶àÁ¬½ÓÎÊÌâ
+//ä½¿ç”¨promiseè§£å†³å•çº¿ç¨‹å¤šè¿æ¥é—®é¢˜
 #include<future>
 void process_connections(connection_set& connections){
 	while (!done(connections)) // 1
 	{
-		for (connection_iterator // ÒÀ´Î¼ì²éÃ¿¸öÁ´½Ó
+		for (connection_iterator // ä¾æ¬¡æ£€æŸ¥æ¯ä¸ªé“¾æ¥
 			connection = connections.begin(), end = connections.end();
 			connection != end;
 			++connection)
 		{
-			if (connection->has_incoming_data()) // ÊÇ·ñÓĞÊı¾İ
+			if (connection->has_incoming_data()) // æ˜¯å¦æœ‰æ•°æ®
 			{
 				data_packet data = connection->incoming();
 				std::promise<payload_type>& p =
-					connection->get_promise(data.id); // Ò»¸öIDÓ³Éäµ½Ò»¸ö std::promise (¿ÉÄÜÊÇÔÚÏà¹ØÈİÆ÷ÖĞ½øĞĞµÄÒÀ´Î²éÕÒ)
+					connection->get_promise(data.id); // ä¸€ä¸ªIDæ˜ å°„åˆ°ä¸€ä¸ª std::promise (å¯èƒ½æ˜¯åœ¨ç›¸å…³å®¹å™¨ä¸­è¿›è¡Œçš„ä¾æ¬¡æŸ¥æ‰¾)
 				p.set_value(data.payload);
 			}
-			if (connection->has_outgoing_data()) // ÕıÔÚ·¢ËÍÒÑÈë¶ÓµÄ´«³öÊı¾İ
+			if (connection->has_outgoing_data()) // æ­£åœ¨å‘é€å·²å…¥é˜Ÿçš„ä¼ å‡ºæ•°æ®
 			{
 				outgoing_packet data =
 					connection->top_of_outgoing_queue();
 				connection->send(data.payload);
-				data.promise.set_value(true); // ´«Êä³É¹¦
+				data.promise.set_value(true); // ä¼ è¾“æˆåŠŸ
 			}
 		}
 	}
@@ -269,31 +269,31 @@ void process_connections(connection_set& connections){
 
 /**
 shared_future
-ÒòÎª std::future ÊÇÖ»ÒÆ¶¯µÄ£¬ËùÒÔÆäËùÓĞÈ¨¿ÉÒÔ
-ÔÚ²»Í¬µÄÊµÀıÖĞ»¥Ïà´«µİ£¬µ«ÊÇÖ»ÓĞÒ»¸öÊµÀı¿ÉÒÔ»ñµÃÌØ¶¨µÄÍ¬²½½á¹û£»
-¶ø std::shared_future ÊµÀıÊÇ¿É¿½±´µÄ£¬ËùÒÔ¶à¸ö¶ÔÏó¿ÉÒÔÒıÓÃÍ¬Ò»¹ØÁª¡°ÆÚÍû¡±µÄ½á¹û¡£
+å› ä¸º std::future æ˜¯åªç§»åŠ¨çš„ï¼Œæ‰€ä»¥å…¶æ‰€æœ‰æƒå¯ä»¥
+åœ¨ä¸åŒçš„å®ä¾‹ä¸­äº’ç›¸ä¼ é€’ï¼Œä½†æ˜¯åªæœ‰ä¸€ä¸ªå®ä¾‹å¯ä»¥è·å¾—ç‰¹å®šçš„åŒæ­¥ç»“æœï¼›
+è€Œ std::shared_future å®ä¾‹æ˜¯å¯æ‹·è´çš„ï¼Œæ‰€ä»¥å¤šä¸ªå¯¹è±¡å¯ä»¥å¼•ç”¨åŒä¸€å…³è”â€œæœŸæœ›â€çš„ç»“æœã€‚
 */
 #include<cassert>
 
 std::promise<int> p;
 std::future<int> f(p.get_future());
-assert(f.valid()); // 1 "ÆÚÍû" f ÊÇºÏ·¨µÄ
+assert(f.valid()); // 1 "æœŸæœ›" f æ˜¯åˆæ³•çš„
 std::shared_future<int> sf(std::move(f));
-assert(!f.valid()); // 2 "ÆÚÍû" f ÏÖÔÚÊÇ²»ºÏ·¨µÄ
-assert(sf.valid()); // 3 sf ÏÖÔÚÊÇºÏ·¨µÄ
+assert(!f.valid()); // 2 "æœŸæœ›" f ç°åœ¨æ˜¯ä¸åˆæ³•çš„
+assert(sf.valid()); // 3 sf ç°åœ¨æ˜¯åˆæ³•çš„
 std::promise<std::string> p;
-std::shared_future<std::string> sf(p.get_future()); // 1 ÒşÊ½×ªÒÆËùÓĞÈ¨
+std::shared_future<std::string> sf(p.get_future()); // 1 éšå¼è½¬ç§»æ‰€æœ‰æƒ
 
-//std::future ÓĞÒ»¸öshare()³ÉÔ±º¯Êı£¬
-//¿ÉÓÃÀ´´´½¨ĞÂµÄ std::shared_future £¬²¢ÇÒ¿ÉÒÔÖ±½Ó×ªÒÆ¡°ÆÚÍû¡±µÄËùÓĞÈ¨¡£
+//std::future æœ‰ä¸€ä¸ªshare()æˆå‘˜å‡½æ•°ï¼Œ
+//å¯ç”¨æ¥åˆ›å»ºæ–°çš„ std::shared_future ï¼Œå¹¶ä¸”å¯ä»¥ç›´æ¥è½¬ç§»â€œæœŸæœ›â€çš„æ‰€æœ‰æƒã€‚
 #include<map>
 std::promise< std::map< int, string>::iterator> p;
 auto sf = p.get_future().share();
 
 /**
-	ÏŞ¶¨µÈ´ıÊ±¼ä
+	é™å®šç­‰å¾…æ—¶é—´
 */
-//µÈ´ıÒ»¸öÌõ¼ş±äÁ¿¡ª¡ªÓĞ³¬Ê±¹¦ÄÜ
+//ç­‰å¾…ä¸€ä¸ªæ¡ä»¶å˜é‡â€”â€”æœ‰è¶…æ—¶åŠŸèƒ½
 #include<chrono>
 condition_variable cv;
 bool done;
@@ -313,14 +313,14 @@ bool wait_loop() {
 }
 
 /**
-	Ê¹ÓÃÍ¬²½²Ù×÷¼ò»¯´úÂë
+	ä½¿ç”¨åŒæ­¥æ“ä½œç®€åŒ–ä»£ç 
 */
-//º¯ÊıÊ½±à³Ì°æ¿ìÅÅ
-//ÊäÈëÒ»¸ölist ·µ»ØÒ»¸ölist
+//å‡½æ•°å¼ç¼–ç¨‹ç‰ˆå¿«æ’
+//è¾“å…¥ä¸€ä¸ªlist è¿”å›ä¸€ä¸ªlist
 /**
-½«inputÁĞ±íĞ¡ÓÚdivided_pointµÄÖµÒÆ¶¯µ½ĞÂÁĞ±ílower_part¢ÜÖĞ¡£
-ÆäËûÊı¼ÌĞøÁôÔÚinputÁĞ±íÖĞ¡£¶øºó£¬Äã¿ÉÒÔÊ¹ÓÃµİ¹éµ÷ÓÃ¢İ¢ŞµÄ·½Ê½£¬¶Ô
-Á½¸öÁĞ±í½øĞĞÅÅĞò
+å°†inputåˆ—è¡¨å°äºdivided_pointçš„å€¼ç§»åŠ¨åˆ°æ–°åˆ—è¡¨lower_partâ‘£ä¸­ã€‚
+å…¶ä»–æ•°ç»§ç»­ç•™åœ¨inputåˆ—è¡¨ä¸­ã€‚è€Œåï¼Œä½ å¯ä»¥ä½¿ç”¨é€’å½’è°ƒç”¨â‘¤â‘¥çš„æ–¹å¼ï¼Œå¯¹
+ä¸¤ä¸ªåˆ—è¡¨è¿›è¡Œæ’åº
 */
 #include<list>
 template<typename T>
@@ -331,7 +331,7 @@ std::list<T> sequential_quick_sort(std::list<T> input)
 		return input;
 	}
 	std::list<T> result;
-	result.splice(result.begin(), input, input.begin()); // ½«ÊäÈëµÄÊ×¸öÔªËØ(ÖĞ¼äÖµ)·ÅÈë½á¹ûÁĞ±íÖĞ
+	result.splice(result.begin(), input, input.begin()); // å°†è¾“å…¥çš„é¦–ä¸ªå…ƒç´ (ä¸­é—´å€¼)æ”¾å…¥ç»“æœåˆ—è¡¨ä¸­
 	T const& pivot = *result.begin(); // 2
 	auto divide_point = std::partition(input.begin(), input.end(),
 		[&](T const& t) {return t < pivot; }); // 3
@@ -347,7 +347,7 @@ std::list<T> sequential_quick_sort(std::list<T> input)
 	return result;
 }
 
-//¿ìÅÅ²¢ĞĞ°æ
+//å¿«æ’å¹¶è¡Œç‰ˆ
 template<typename T>
 std::list<T> parallel_quick_sort(list<T> input)
 {
@@ -356,18 +356,18 @@ std::list<T> parallel_quick_sort(list<T> input)
 	}
 
 	list<T> result;
-	result.splice(result, begin(), input, input.begin()); //½«µÚÒ»¸öÖµ×÷Îª±êÖ¾
+	result.splice(result, begin(), input, input.begin()); //å°†ç¬¬ä¸€ä¸ªå€¼ä½œä¸ºæ ‡å¿—
 	T const& pivot = *result.begin();
 
 	auto divide_point(std::partition(input.begin(), input.end(), [&](T const& t) {return t < pivot; }));
 
 	list<T> lower_part;
-	lower_part.splice(lower_part.end(), input.begin(), divide_point); //½«±È±êÖ¾ÖµĞ¡µÄ²¿·Ö¿½±´µ½lower_part
+	lower_part.splice(lower_part.end(), input.begin(), divide_point); //å°†æ¯”æ ‡å¿—å€¼å°çš„éƒ¨åˆ†æ‹·è´åˆ°lower_part
 
-	std::future<list<T>> new_lower( //µ±Ç°Ïß³Ì²»¶ÔĞ¡ÓÚ¡°ÖĞ¼ä¡±Öµ²¿·ÖµÄÁĞ±í½øĞĞÅÅĞò£¬Ê¹ÓÃ std::async() ÔÚÁíÒ»Ïß³Ì¶ÔÆä½øĞĞÅÅĞò¡£
+	std::future<list<T>> new_lower( //å½“å‰çº¿ç¨‹ä¸å¯¹å°äºâ€œä¸­é—´â€å€¼éƒ¨åˆ†çš„åˆ—è¡¨è¿›è¡Œæ’åºï¼Œä½¿ç”¨ std::async() åœ¨å¦ä¸€çº¿ç¨‹å¯¹å…¶è¿›è¡Œæ’åºã€‚
 		std::async(&parallel_quick_sort<T>, move(lower_part)));
 
-	auto new_higher(parallel_quick_sort(move(input))); //Ê¹ÓÃµİ¹éÅÅĞò
+	auto new_higher(parallel_quick_sort(move(input))); //ä½¿ç”¨é€’å½’æ’åº
 
 	result.splice(result.end(), new_higher);
 	result.splice(result.begin(), new_lower.get()); // 4
@@ -375,7 +375,7 @@ std::list<T> parallel_quick_sort(list<T> input)
 }
 
 
-//spawn_taskµÄ¼òµ¥ÊµÏÖ
+//spawn_taskçš„ç®€å•å®ç°
 template<typename F, typename A>
 std::future<std::result_of<F(A&&)>::type>
 spawn_task(F&& f, A&& a)
@@ -389,7 +389,7 @@ spawn_task(F&& f, A&& a)
 		return res;
 }
 
-//ATMÂß¼­ÀàµÄ¼òµ¥ÊµÏÖ
+//ATMé€»è¾‘ç±»çš„ç®€å•å®ç°
 struct card_inserted
 {
 	std::string account;

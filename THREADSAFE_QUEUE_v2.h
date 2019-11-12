@@ -1,10 +1,10 @@
 #pragma once
 /**
-³ÖÓĞ std::shared_ptr<> ÊµÀıµÄÏß³Ì°²È«¶ÓÁĞ
+æŒæœ‰ std::shared_ptr<> å®ä¾‹çš„çº¿ç¨‹å®‰å…¨é˜Ÿåˆ—
 */
 /**
-std::shared_ptr<> ³ÖÓĞÊı¾İµÄºÃ´¦£ºĞÂµÄÊµÀı·ÖÅä½áÊøÊ±£¬²»»á±»ËøÔÚpush()¢İµ±ÖĞ(¶øÔÚTHREADSAFE_QUEUEÖĞ£¬Ö»ÄÜÔÚpop()³ÖÓĞËøÊ±Íê³É)¡£
-ÒòÎªÄÚ´æ·ÖÅä²Ù×÷µÄĞèÒªÔÚĞÔÄÜÉÏ¸¶³öºÜ¸ßµÄ´ú¼Û(ĞÔÄÜ½ÏµÍ)£¬ËùÒÔÊ¹ÓÃ std::shared_ptr<> µÄ·½Ê½¶Ô¶ÓÁĞµÄĞÔÄÜÓĞºÜ´óµÄÌáÉı£¬Æä¼õÉÙÁË»¥³âÁ¿³ÖÓĞµÄÊ±¼ä£¬ÔÊĞíÆäËûÏß³ÌÔÚ·ÖÅäÄÚ´æµÄÍ¬Ê±£¬¶Ô¶ÓÁĞ½øĞĞÆäËûµÄ²Ù×÷¡£
+std::shared_ptr<> æŒæœ‰æ•°æ®çš„å¥½å¤„ï¼šæ–°çš„å®ä¾‹åˆ†é…ç»“æŸæ—¶ï¼Œä¸ä¼šè¢«é”åœ¨push()â‘¤å½“ä¸­(è€Œåœ¨THREADSAFE_QUEUEä¸­ï¼Œåªèƒ½åœ¨pop()æŒæœ‰é”æ—¶å®Œæˆ)ã€‚
+å› ä¸ºå†…å­˜åˆ†é…æ“ä½œçš„éœ€è¦åœ¨æ€§èƒ½ä¸Šä»˜å‡ºå¾ˆé«˜çš„ä»£ä»·(æ€§èƒ½è¾ƒä½)ï¼Œæ‰€ä»¥ä½¿ç”¨ std::shared_ptr<> çš„æ–¹å¼å¯¹é˜Ÿåˆ—çš„æ€§èƒ½æœ‰å¾ˆå¤§çš„æå‡ï¼Œå…¶å‡å°‘äº†äº’æ–¥é‡æŒæœ‰çš„æ—¶é—´ï¼Œå…è®¸å…¶ä»–çº¿ç¨‹åœ¨åˆ†é…å†…å­˜çš„åŒæ—¶ï¼Œå¯¹é˜Ÿåˆ—è¿›è¡Œå…¶ä»–çš„æ“ä½œã€‚
 */
 #include<memory>
 #include <queue>
@@ -24,14 +24,14 @@ public:
 	void wait_and_pop(T& value) {
 		unique_lock<mutex> lk(mut);
 		data_cond.wait(lk, [this] {return !data_queue.empty()});
-		value = std::move(*data_queue.front()); //·µ»ØÒ»¸öÒıÓÃ
+		value = std::move(*data_queue.front()); //è¿”å›ä¸€ä¸ªå¼•ç”¨
 		data_queue.pop();
 	}
 
 	bool try_pop(T& val) {
 		lock_guard<mutex> lk(mut);
 		if (data_queue.empty()) { return false; }
-		val = std::move(*data_queue.front()); //·µ»ØÒ»¸öÒıÓÃ
+		val = std::move(*data_queue.front()); //è¿”å›ä¸€ä¸ªå¼•ç”¨
 		data_queue.pop();
 		return true;
 	}
@@ -39,7 +39,7 @@ public:
 	shared_ptr<T> wait_and_pop() {
 		unique_lock<mutex> lk(mut);
 		data_cond.wait(lk, [this] {return !data_queue.empty(); });
-		shared_ptr<T> res = data_queue.front(); // ·µ»ØÒ»¸öshared_ptrÊµÀı
+		shared_ptr<T> res = data_queue.front(); // è¿”å›ä¸€ä¸ªshared_ptrå®ä¾‹
 		data_queue.pop();
 		return res;
 	}
@@ -50,7 +50,7 @@ public:
 		std::lock_guard<std::mutex> lk(mut);
 		if (data_queue.empty())
 			return std::shared_ptr<T>();
-		std::shared_ptr<T> res = data_queue.front(); // ·µ»ØÒ»¸öshared_ptrÊµÀı
+		std::shared_ptr<T> res = data_queue.front(); // è¿”å›ä¸€ä¸ªshared_ptrå®ä¾‹
 		data_queue.pop();
 		return res;
 	}
