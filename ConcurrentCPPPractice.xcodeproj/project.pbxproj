@@ -23,9 +23,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B410BF27237BAAD200509054 /* ConcurrentCPPPractice */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ConcurrentCPPPractice; sourceTree = "<group>"; };
+		B410BF27237BAAD200509054 /* ConcurrentCPPPractice */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ConcurrentCPPPractice; sourceTree = "<group>"; };
 		B410BF28237BABD800509054 /* ConcurrentHelloWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConcurrentHelloWorld.cpp; sourceTree = "<group>"; };
 		B49B5608237BA450003D29B1 /* ConcurrentCPPPractice */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ConcurrentCPPPractice; sourceTree = BUILT_PRODUCTS_DIR; };
+		B4F48AE3237ED54200C8D487 /* threadsafe_stack.h */ = {isa = PBXFileReference; fileEncoding = 2147484705; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = threadsafe_stack.h; sourceTree = "<group>"; };
+		B4F48AE4237EDF7400C8D487 /* THREADSAFE_QUEUE_with_condition_variable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = THREADSAFE_QUEUE_with_condition_variable.h; sourceTree = "<group>"; };
+		B4F48AE5237EE10200C8D487 /* THREADSAFE_QUEUE_shared_ptr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = THREADSAFE_QUEUE_shared_ptr.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +61,9 @@
 		B49B560A237BA450003D29B1 /* ConcurrentCPPPractice */ = {
 			isa = PBXGroup;
 			children = (
+				B4F48AE5237EE10200C8D487 /* THREADSAFE_QUEUE_shared_ptr.h */,
+				B4F48AE4237EDF7400C8D487 /* THREADSAFE_QUEUE_with_condition_variable.h */,
+				B4F48AE3237ED54200C8D487 /* threadsafe_stack.h */,
 				B410BF28237BABD800509054 /* ConcurrentHelloWorld.cpp */,
 				B410BF27237BAAD200509054 /* ConcurrentCPPPractice */,
 			);

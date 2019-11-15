@@ -10,7 +10,11 @@ struct empty_stack : std::exception
 	};
 };
 
-/**Ïß³Ì°²È«µÄÕ»µÄÊµÏÖ*/
+/**çº¿ç¨‹å®‰å…¨çš„æ ˆçš„å®ç°*/
+/*
+ å®šæœŸç­‰å¾…å’Œæ£€æŸ¥empty()å’Œpop()ä»¥åŠå¯¹äºempty_stackå¼‚å¸¸è¿›è¡Œå…³æ³¨ä¼šæµªè´¹æ ˆçš„èµ„æº
+ è€ƒè™‘ä½¿ç”¨æ¡ä»¶å˜é‡æ¥å¼‚æ­¥é€šçŸ¥
+ */
 template<typename T>
 class threadsafe_stack {
 private:
@@ -22,25 +26,25 @@ public:
 	}
 	threadsafe_stack(const threadsafe_stack& other) {
 		std::lock_guard<std::mutex> guard;
-		data = other.data; //Ö´ĞĞ¿½±´
+		data = other.data; //æ‰§è¡Œæ‹·è´
 	}
-	threadsafe_stack& operator=(const threadsafe_stack&) = delete;//¸´ÖÆ²Ù×÷±»É¾³ı
+	threadsafe_stack& operator=(const threadsafe_stack&) = delete;//å¤åˆ¶æ“ä½œè¢«åˆ é™¤
 
 	void push(T new_value) {
 		std::lock_guard<std::mutex> guard;
-		data.push(std::move(new_value)); //std::stack±£Ö¤data.pushµÄµ÷ÓÃ°²È«
+		data.push(std::move(new_value)); //std::stackä¿è¯data.pushçš„è°ƒç”¨å®‰å…¨
 	}
-	//·µ»ØÒ»¸öÖ¸Ïòµ¯³öÔªËØµÄÖ¸Õë£¬¶ø²»ÊÇÖ±½Ó·µ»ØÖµ
-	//Õ»Îª¿ÕµÄÊ±ºòpopº¯ÊıÅ×³öÒ»¸öempty_stackÒì³£
+	//è¿”å›ä¸€ä¸ªæŒ‡å‘å¼¹å‡ºå…ƒç´ çš„æŒ‡é’ˆï¼Œè€Œä¸æ˜¯ç›´æ¥è¿”å›å€¼
+	//æ ˆä¸ºç©ºçš„æ—¶å€™popå‡½æ•°æŠ›å‡ºä¸€ä¸ªempty_stackå¼‚å¸¸
 	std::shared_ptr<T> pop() {
 		std::lock_guard<std::mutex> lock(m);
-		if (data.empty()) throw empty_stack();//µ÷ÓÃpopÇ°£¬ÏÈ¼ì²éÕ»ÊÇ·ñÎª¿Õ
+		if (data.empty()) throw empty_stack();//è°ƒç”¨popå‰ï¼Œå…ˆæ£€æŸ¥æ ˆæ˜¯å¦ä¸ºç©º
 
-		std::shared_ptr<T> const res(std::make_shared<T>(data.top())); //ĞŞ¸Ä¶ÑÕ»Ç°£¬·ÖÅä³ö·µ»ØÖµ
+		std::shared_ptr<T> const res(std::make_shared<T>(data.top())); //ä¿®æ”¹å †æ ˆå‰ï¼Œåˆ†é…å‡ºè¿”å›å€¼
 		data.pop();
 		return res;
 	}
-	//Ê¹ÓÃÒ»¸ö¾Ö²¿ÒıÓÃÈ¥´æ´¢µ¯³öÖµ
+	//ä½¿ç”¨ä¸€ä¸ªå±€éƒ¨å¼•ç”¨å»å­˜å‚¨å¼¹å‡ºå€¼
 	void pop(T& value) {
 		std::lock_guard<std::mutex> lock(m);
 		if (data.empty()) throw empty_stack();

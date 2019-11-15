@@ -70,7 +70,7 @@ void some_other_function() {
 	cout << "some other function" << endl;
 }
 
-//Ê¹ÓÃmove ĞÂÏß³ÌÖ±½Ó´«µİµ½scoped_threadÖĞ
+//ä½¿ç”¨move æ–°çº¿ç¨‹ç›´æ¥ä¼ é€’åˆ°scoped_threadä¸­
 class scoped_thread {
 	std::thread t;
 public:
@@ -87,7 +87,7 @@ public:
 };
 
 /**
-ÅúÁ¿²úÉúÏß³Ì
+æ‰¹é‡äº§ç”Ÿçº¿ç¨‹
 */
 void do_work(unsigned id) {
 	cout << id << endl;
@@ -96,15 +96,15 @@ void batch_f() {
 	std::vector<std::thread> threads;
 	for (unsigned i = 0; i < 20; ++i)
 	{
-		threads.push_back(std::thread(do_work, i)); // ²úÉúÏß³Ì
+		threads.push_back(std::thread(do_work, i)); // äº§ç”Ÿçº¿ç¨‹
 	}
 	std::for_each(threads.begin(), threads.end(),
-		std::mem_fn(&std::thread::join)); // ¶ÔÃ¿¸öÏß³Ìµ÷ÓÃjoin()
+		std::mem_fn(&std::thread::join)); // å¯¹æ¯ä¸ªçº¿ç¨‹è°ƒç”¨join()
 
 }
 
 /**
-²¢ĞĞ°æstd::accumulate ÀÛ¼ÓÒ»¸öÈİÆ÷ÀïÃæµÄËùÓĞÖµ½á¹û
+å¹¶è¡Œç‰ˆstd::accumulate ç´¯åŠ ä¸€ä¸ªå®¹å™¨é‡Œé¢çš„æ‰€æœ‰å€¼ç»“æœ
 */
 #include<numeric>
 template<typename Iterator,typename T>
@@ -116,38 +116,38 @@ struct accumulate_block {
 
 template<typename Iterator, typename T>
 T parallel_accmulate(Iterator first, Iterator last, T init) {
-	//²¢ĞĞÊı¾İ³¤¶È
+	//å¹¶è¡Œæ•°æ®é•¿åº¦
 	unsigned long const length = std::distance(first, last);
 	
 	if (!length)
 		return init;
 
 	unsigned long const min_per_thread = 25; 
-	unsigned long const max_threads = (length + min_per_thread - 1) / min_per_thread; // ÒªÓÃ·¶Î§ÄÚÔªËØµÄ×ÜÊıÁ¿³ıÒÔÏß³Ì(¿é)ÖĞ×îĞ¡ÈÎÎñÊı£¬´Ó¶øÈ·¶¨Æô¶¯Ïß³ÌµÄ×î´óÊıÁ¿
-	unsigned long const hardware_threads=std::thread::hardware_concurrency(); //·µ»ØÄÜÍ¬Ê±²¢·¢ÔÚÒ»¸ö³ÌĞòÖĞµÄÏß³ÌÊı
+	unsigned long const max_threads = (length + min_per_thread - 1) / min_per_thread; // è¦ç”¨èŒƒå›´å†…å…ƒç´ çš„æ€»æ•°é‡é™¤ä»¥çº¿ç¨‹(å—)ä¸­æœ€å°ä»»åŠ¡æ•°ï¼Œä»è€Œç¡®å®šå¯åŠ¨çº¿ç¨‹çš„æœ€å¤§æ•°é‡
+	unsigned long const hardware_threads=std::thread::hardware_concurrency(); //è¿”å›èƒ½åŒæ—¶å¹¶å‘åœ¨ä¸€ä¸ªç¨‹åºä¸­çš„çº¿ç¨‹æ•°
 	unsigned long const num_threads = // 
 		std::min(hardware_threads != 0 ? hardware_threads : 2, max_threads);
 
-	unsigned long const block_size = length / num_threads; //Ã¿¸öÏß³ÌÖĞ´¦ÀíµÄÔªËØÊıÁ¿
+	unsigned long const block_size = length / num_threads; //æ¯ä¸ªçº¿ç¨‹ä¸­å¤„ç†çš„å…ƒç´ æ•°é‡
 
 	std::vector<T> results(num_threads);
-	std::vector<std::thread> threads(num_threads - 1); //ÏµÍ³ÒÑÓĞÖ÷Ïß³Ì Òò´ËĞèÒªÉÙÒ»¸ö
+	std::vector<std::thread> threads(num_threads - 1); //ç³»ç»Ÿå·²æœ‰ä¸»çº¿ç¨‹ å› æ­¤éœ€è¦å°‘ä¸€ä¸ª
 
 	Iterator block_start = first;
 	for (unsigned long i = 0; i < (num_threads - 1); ++i)
 	{
 		Iterator block_end = block_start;
-		std::advance(block_end, block_size); // ÏòÇ°ÒÆ¶¯block_size
+		std::advance(block_end, block_size); // å‘å‰ç§»åŠ¨block_size
 		threads[i] = std::thread( // 7
 			accumulate_block<Iterator, T>(),
 			block_start, block_end, std::ref(results[i]));
 		block_start = block_end; // 8
 	}
 	accumulate_block<Iterator, T>()(
-		block_start, last, results[num_threads - 1]); // ×îºóÒ»¸öblock¿ÉÄÜ²»Âúblock_size¸öÔªËØ
+		block_start, last, results[num_threads - 1]); // æœ€åä¸€ä¸ªblockå¯èƒ½ä¸æ»¡block_sizeä¸ªå…ƒç´ 
 	std::for_each(threads.begin(), threads.end(),
 		std::mem_fn(&std::thread::join)); // 10
-	return std::accumulate(results.begin(), results.end(), init); // ×îÖÕµÄÀÛ¼Ó
+	return std::accumulate(results.begin(), results.end(), init); // æœ€ç»ˆçš„ç´¯åŠ 
 }
 
 std::thread::id master_thread = std::this_thread::get_id();
@@ -178,6 +178,6 @@ int main(){
 	std::thread t3; // 4
 	t3 = std::move(t2); // 5
 	//std::terminate();
-	//t1 = std::move(t3); // 6 ¸³Öµ²Ù×÷½«Ê¹³ÌĞò±ÀÀ£ ²»¿ÉÍ¨¹ı¸³ĞÂÖµÀ´Å×ÆúÒ»¸ö½ø³Ì
+	//t1 = std::move(t3); // 6 èµ‹å€¼æ“ä½œå°†ä½¿ç¨‹åºå´©æºƒ ä¸å¯é€šè¿‡èµ‹æ–°å€¼æ¥æŠ›å¼ƒä¸€ä¸ªè¿›ç¨‹
 }
 */
