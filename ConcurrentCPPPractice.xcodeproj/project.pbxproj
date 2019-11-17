@@ -29,6 +29,9 @@
 		B4F48AE3237ED54200C8D487 /* threadsafe_stack.h */ = {isa = PBXFileReference; fileEncoding = 2147484705; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = threadsafe_stack.h; sourceTree = "<group>"; };
 		B4F48AE4237EDF7400C8D487 /* THREADSAFE_QUEUE_with_condition_variable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = THREADSAFE_QUEUE_with_condition_variable.h; sourceTree = "<group>"; };
 		B4F48AE5237EE10200C8D487 /* THREADSAFE_QUEUE_shared_ptr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = THREADSAFE_QUEUE_shared_ptr.h; sourceTree = "<group>"; };
+		B4F48AE72380F71700C8D487 /* SINGLE_THREAD_QUEUE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SINGLE_THREAD_QUEUE.h; sourceTree = "<group>"; };
+		B4F48AE82381028C00C8D487 /* QUEUE_with_virtual_head_tail.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QUEUE_with_virtual_head_tail.h; sourceTree = "<group>"; };
+		B4F48AEA2381091B00C8D487 /* THREADSAFE_QUEUE_with_fined_grained_lock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = THREADSAFE_QUEUE_with_fined_grained_lock.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +69,9 @@
 				B4F48AE3237ED54200C8D487 /* threadsafe_stack.h */,
 				B410BF28237BABD800509054 /* ConcurrentHelloWorld.cpp */,
 				B410BF27237BAAD200509054 /* ConcurrentCPPPractice */,
+				B4F48AE72380F71700C8D487 /* SINGLE_THREAD_QUEUE.h */,
+				B4F48AE82381028C00C8D487 /* QUEUE_with_virtual_head_tail.h */,
+				B4F48AEA2381091B00C8D487 /* THREADSAFE_QUEUE_with_fined_grained_lock.h */,
 			);
 			path = ConcurrentCPPPractice;
 			sourceTree = "<group>";

@@ -69,3 +69,19 @@ wait_and_pop()，将会等待有值可检索的时候才返回。
 
 [源码](https://github.com/traviszeng/ConcurrentCPPPractice/blob/master/ConcurrentCPPPractice/THREADSAFE_QUEUE_shared_ptr.h)
 
+#### 使用细粒度锁的线程安全队列
+
+对于每个元素使用一个互斥量来保护，可以使用细粒度锁进行保护。
+
+单线程版本的线程安全队列[源码](https://github.com/traviszeng/ConcurrentCPPPractice/blob/master/ConcurrentCPPPractice/SINGLE_THREAD_QUEUE.h)
+
+通过添加虚拟头尾指针实现头尾分离，从而实现一定程度的并发。
+
+[源码](https://github.com/traviszeng/ConcurrentCPPPractice/blob/master/ConcurrentCPPPractice/QUEUE_with_virtual_head_tail.h)
+
+基于虚拟指针的使用细粒度锁的线程安全队列：
+
+分别对头和尾采用两个互斥量进行保护，可以更大程度的实现并发性能。
+
+[源码](https://github.com/traviszeng/ConcurrentCPPPractice/blob/master/ConcurrentCPPPractice/THREADSAFE_QUEUE_with_fined_grained_lock.h)
+
