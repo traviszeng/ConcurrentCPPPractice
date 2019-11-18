@@ -28,6 +28,19 @@ private:
         return tail;
     }
     
+
+//    std::unique_ptr<node> pop_head(){  //有缺陷的实现
+//        node* const old_tail = get_tail(); //在head_mutex范围外获取旧尾节点的值
+//        std::lock_guard<std::mutex> head_lock(head_mutex);
+//        if(head.get()==old_tail){
+//            return nullptr;
+//        }
+//        std::unique_ptr<node> old_head = std::move(head);
+//        head = std::move(old_head->next);
+//        return old_head;
+//    }
+    
+    
     std::unique_ptr<node> pop_head(){
         std::lock_guard<std::mutex> head_lock(head_mutex);
         if(head.get()==get_tail()){
@@ -59,6 +72,7 @@ public:
         tail->next = std::move(p); //此时p已释放
         tail = new_tail;
     }
+    
 };
 
 
