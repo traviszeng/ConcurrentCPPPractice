@@ -21,17 +21,17 @@ private:
 	std::stack<T> data;
 	mutable std::mutex m;
 public:
-	threadsafe_stack() :data(std::stack<int>) {
+	threadsafe_stack() :data(std::stack<int>()) {
 		
 	}
 	threadsafe_stack(const threadsafe_stack& other) {
-		std::lock_guard<std::mutex> guard;
+		std::lock_guard<std::mutex> guard(m);
 		data = other.data; //执行拷贝
 	}
 	threadsafe_stack& operator=(const threadsafe_stack&) = delete;//复制操作被删除
 
 	void push(T new_value) {
-		std::lock_guard<std::mutex> guard;
+		std::lock_guard<std::mutex> guard(m);
 		data.push(std::move(new_value)); //std::stack保证data.push的调用安全
 	}
 	//返回一个指向弹出元素的指针，而不是直接返回值

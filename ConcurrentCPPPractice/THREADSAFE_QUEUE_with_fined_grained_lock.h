@@ -12,7 +12,7 @@
 template<typename T>
 class threadsafe_queue{
 private:
-    struct{
+    struct node{
         std::shared_ptr<T> data;
         std::unique_ptr<node> next;
         
@@ -58,7 +58,7 @@ public:
     threadsafe_queue(const threadsafe_queue& other) = delete;
     threadsafe_queue& operator=(const threadsafe_queue& other) = delete;
     
-    std::shared<T> try_pop(){
+    std::shared_ptr<T> try_pop(){
         std::unique_ptr<T> res = pop_head();
         return res;
     }
@@ -67,7 +67,7 @@ public:
         std::shared_ptr<T> new_data(std::make_shared<T>(std::move(new_val)));
         std::unique_ptr<node> p(new node);
         node* const new_tail = p.get();
-        std::lock_guard<std::murex> tail_lock(tail_mutex);
+        std::lock_guard<std::mutex> tail_lock(tail_mutex);
         tail->data = new_data;
         tail->next = std::move(p); //此时p已释放
         tail = new_tail;

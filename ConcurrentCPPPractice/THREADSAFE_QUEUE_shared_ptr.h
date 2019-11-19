@@ -22,24 +22,24 @@ public:
 	{}
 
 	void wait_and_pop(T& value) {
-		unique_lock<mutex> lk(mut);
-		data_cond.wait(lk, [this] {return !data_queue.empty()});
+        std::unique_lock<std::mutex> lk(mut);
+        data_cond.wait(lk, [this] {return !data_queue.empty();});
 		value = std::move(*data_queue.front()); //返回一个引用
 		data_queue.pop();
 	}
 
 	bool try_pop(T& val) {
-		lock_guard<mutex> lk(mut);
+        std::lock_guard<std::mutex> lk(mut);
 		if (data_queue.empty()) { return false; }
 		val = std::move(*data_queue.front()); //返回一个引用
 		data_queue.pop();
 		return true;
 	}
 
-	shared_ptr<T> wait_and_pop() {
-		unique_lock<mutex> lk(mut);
+	std::shared_ptr<T> wait_and_pop() {
+		std::unique_lock<std::mutex> lk(mut);
 		data_cond.wait(lk, [this] {return !data_queue.empty(); });
-		shared_ptr<T> res = data_queue.front(); // 返回一个shared_ptr实例
+		std::shared_ptr<T> res = data_queue.front(); // 返回一个shared_ptr实例
 		data_queue.pop();
 		return res;
 	}
@@ -56,8 +56,8 @@ public:
 	}
 
 	void push(T new_val) {
-		shared_ptr<T> data(std::make_shared<T>(move(new_val))); //5
-		lock_guard<mutex> lk(mut);
+		std::shared_ptr<T> data(std::make_shared<T>(move(new_val))); //5
+        std::lock_guard<std::mutex> lk(mut);
 		data_queue.push(data);
 		data_cond.notify_one();
 	}

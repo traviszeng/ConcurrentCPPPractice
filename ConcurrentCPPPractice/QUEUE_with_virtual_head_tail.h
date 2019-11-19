@@ -25,13 +25,13 @@ public:
     queue(const queue& other) = delete;
     queue& operator=(const queue& other) = delete;
     
-    std::shared_ptr try_pop(){
+    std::shared_ptr<T> try_pop(){
         if(head.get()==tail){
             return std::shared_ptr<T>();
         }
         
         std::shared_ptr<T> const res(head->data);
-        std::unique<node> old_head = std::move(head);
+        std::unique_ptr<node> old_head = std::move(head);
         head = std::move(old_head->next);
         return res;
     }

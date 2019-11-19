@@ -22,25 +22,25 @@ class threadsafe_queue {
 private:
 	mutable std::mutex mut; //互斥量必须是可变的
 	queue<T> data_queue;
-	condition_variable data_cond;
+	std::condition_variable data_cond;
 
 
 public:
 	threadsafe_queue() {}
 	threadsafe_queue(const threadsafe_queue& other) {
-		std::lock_guard<mutex> lk(other.mut);
+		std::lock_guard<std::mutex> lk(other.mut);
 		data_queue = other.data_queue;
 	}
 	threadsafe_queue& operator=(
 		const threadsafe_queue&) = delete; // 不允许简单的赋值
 
 	void push(T new_value) {
-		std::lock_guard<mutex> lk(mut);
+		std::lock_guard<std::mutex> lk(mut);
 		data_queue.push(new_value);
 		data_cond.notify_one();
 	}
 	bool try_pop(T& value) {
-		lock_guard<mutex> lk(mut);
+		std::lock_guard<std::mutex> lk(mut);
 		if (data_queue.empty()) {
 			return false;
 		}
@@ -50,18 +50,18 @@ public:
 	} 
 
 	std::shared_ptr<T> try_pop() {
-		lock_guard<mutex> lk(mut);
+		std::lock_guard<std::mutex> lk(mut);
 		if (data_queue.empty()) {
-			return shared_ptr<T>();
+			return std::shared_ptr<T>();
 		}
 		std::shared_ptr<T> res(
 			std::make_shared<T>(std::move(data_queue.front())));
 		data_queue.pop();
-		return ptr;
+		return res;
 	} 
 
 	void wait_and_pop(T& value) {
-		unique_lock<mutex> lk(mut);
+		std::unique_lock<std::mutex> lk(mut);
 		data_cond.wait(lk, [this] {return !data_queue.empty(); });
 		value = std::move(data_queue.front());
 		data_queue.pop();
@@ -80,7 +80,7 @@ public:
 		使用方案三进行改进见THREADSAFE_QUEUE_shared_ptr.h
 	*/
 	std::shared_ptr<T> wait_and_pop() { 
-		unique_lock<mutex> lk(mut);
+		std::unique_lock<std::mutex> lk(mut);
 		data_cond.wait(lk, [this] {return !data_queue.empty(); });
 		std::shared_ptr<T> res(
 			std::make_shared<T>(std::move(data_queue.front())));
@@ -88,7 +88,7 @@ public:
 		return res;
 	}
 	bool empty() const {
-		lock_guard<mutex> lk(mut);
+		std::lock_guard<std::mutex> lk(mut);
 		return data_queue.empty();
 	}
 
