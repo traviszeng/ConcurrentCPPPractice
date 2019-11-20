@@ -85,3 +85,20 @@ wait_and_pop()，将会等待有值可检索的时候才返回。
 
 [源码](https://github.com/traviszeng/ConcurrentCPPPractice/blob/master/ConcurrentCPPPractice/THREADSAFE_QUEUE_with_fined_grained_lock.h)
 
+#### 使用细粒度锁和条件变量实现可等待的无界队列
+
+[源码](https://github.com/traviszeng/ConcurrentCPPPractice/blob/master/ConcurrentCPPPractice/THREADSAFE_QUEUE_with_fined_grained_lock_and_condition_variable.h)
+
+
+#### 使用锁的线程安全查询表
+
+需要使用到c++的boost库
+
+Mac OS上使用brew的安装方法：
+
+	brew install boost
+	
+
+
+
+

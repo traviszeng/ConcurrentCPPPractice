@@ -19,6 +19,7 @@
 //#include"THREADSAFE_QUEUE_shared_ptr.h"
 //#include"QUEUE_with_virtual_head_tail.h"
 #include"THREADSAFE_QUEUE_with_fined_grained_lock.h"
+#include"THREADSAFE_LOOKUP_TABLE.h"
 using namespace std;
 
 void hello(){

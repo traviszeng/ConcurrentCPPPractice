@@ -23,8 +23,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		B410BF27237BAAD200509054 /* ConcurrentCPPPractice */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ConcurrentCPPPractice; sourceTree = "<group>"; };
 		B410BF28237BABD800509054 /* ConcurrentHelloWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConcurrentHelloWorld.cpp; sourceTree = "<group>"; };
+		B4311C8C2384E664004768C0 /* THREADSAFE_LOOKUP_TABLE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = THREADSAFE_LOOKUP_TABLE.h; sourceTree = "<group>"; };
 		B49B5608237BA450003D29B1 /* ConcurrentCPPPractice */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ConcurrentCPPPractice; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4F48AE3237ED54200C8D487 /* threadsafe_stack.h */ = {isa = PBXFileReference; fileEncoding = 2147484705; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = threadsafe_stack.h; sourceTree = "<group>"; };
 		B4F48AE4237EDF7400C8D487 /* THREADSAFE_QUEUE_with_condition_variable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = THREADSAFE_QUEUE_with_condition_variable.h; sourceTree = "<group>"; };
@@ -32,6 +32,7 @@
 		B4F48AE72380F71700C8D487 /* SINGLE_THREAD_QUEUE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SINGLE_THREAD_QUEUE.h; sourceTree = "<group>"; };
 		B4F48AE82381028C00C8D487 /* QUEUE_with_virtual_head_tail.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = QUEUE_with_virtual_head_tail.h; sourceTree = "<group>"; };
 		B4F48AEA2381091B00C8D487 /* THREADSAFE_QUEUE_with_fined_grained_lock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = THREADSAFE_QUEUE_with_fined_grained_lock.h; sourceTree = "<group>"; };
+		B4F48AEB238415DB00C8D487 /* THREADSAFE_QUEUE_with_fined_grained_lock_and_condition_variable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = THREADSAFE_QUEUE_with_fined_grained_lock_and_condition_variable.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,10 +69,11 @@
 				B4F48AE4237EDF7400C8D487 /* THREADSAFE_QUEUE_with_condition_variable.h */,
 				B4F48AE3237ED54200C8D487 /* threadsafe_stack.h */,
 				B410BF28237BABD800509054 /* ConcurrentHelloWorld.cpp */,
-				B410BF27237BAAD200509054 /* ConcurrentCPPPractice */,
 				B4F48AE72380F71700C8D487 /* SINGLE_THREAD_QUEUE.h */,
 				B4F48AE82381028C00C8D487 /* QUEUE_with_virtual_head_tail.h */,
 				B4F48AEA2381091B00C8D487 /* THREADSAFE_QUEUE_with_fined_grained_lock.h */,
+				B4F48AEB238415DB00C8D487 /* THREADSAFE_QUEUE_with_fined_grained_lock_and_condition_variable.h */,
+				B4311C8C2384E664004768C0 /* THREADSAFE_LOOKUP_TABLE.h */,
 			);
 			path = ConcurrentCPPPractice;
 			sourceTree = "<group>";
@@ -253,6 +255,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				"HEADER_SEARCH_PATHS[arch=*]" = /usr/local/Cellar/boost/1.71.0/include;
+				"LIBRARY_SEARCH_PATHS[arch=*]" = /usr/local/Cellar/boost/1.71.0/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -261,6 +265,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				"HEADER_SEARCH_PATHS[arch=*]" = /usr/local/Cellar/boost/1.71.0/include;
+				"LIBRARY_SEARCH_PATHS[arch=*]" = /usr/local/Cellar/boost/1.71.0/lib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
