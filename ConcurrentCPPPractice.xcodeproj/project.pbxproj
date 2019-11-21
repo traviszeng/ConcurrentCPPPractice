@@ -25,6 +25,7 @@
 /* Begin PBXFileReference section */
 		B410BF28237BABD800509054 /* ConcurrentHelloWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConcurrentHelloWorld.cpp; sourceTree = "<group>"; };
 		B4311C8C2384E664004768C0 /* THREADSAFE_LOOKUP_TABLE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = THREADSAFE_LOOKUP_TABLE.h; sourceTree = "<group>"; };
+		B4311C8E2386CA64004768C0 /* THREADSAFE_LIST.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = THREADSAFE_LIST.h; sourceTree = "<group>"; };
 		B49B5608237BA450003D29B1 /* ConcurrentCPPPractice */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ConcurrentCPPPractice; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4F48AE3237ED54200C8D487 /* threadsafe_stack.h */ = {isa = PBXFileReference; fileEncoding = 2147484705; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = threadsafe_stack.h; sourceTree = "<group>"; };
 		B4F48AE4237EDF7400C8D487 /* THREADSAFE_QUEUE_with_condition_variable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = THREADSAFE_QUEUE_with_condition_variable.h; sourceTree = "<group>"; };
@@ -74,6 +75,7 @@
 				B4F48AEA2381091B00C8D487 /* THREADSAFE_QUEUE_with_fined_grained_lock.h */,
 				B4F48AEB238415DB00C8D487 /* THREADSAFE_QUEUE_with_fined_grained_lock_and_condition_variable.h */,
 				B4311C8C2384E664004768C0 /* THREADSAFE_LOOKUP_TABLE.h */,
+				B4311C8E2386CA64004768C0 /* THREADSAFE_LIST.h */,
 			);
 			path = ConcurrentCPPPractice;
 			sourceTree = "<group>";

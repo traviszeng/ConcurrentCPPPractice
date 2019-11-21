@@ -92,13 +92,45 @@ wait_and_pop()，将会等待有值可检索的时候才返回。
 
 #### 使用锁的线程安全查询表
 
+查询表的常用基本功能如下：
+
+1.添加一对“键值-数据” 
+
+2.修改指定键值所对应的数据 
+
+3.删除一组值 
+
+4.通过给定键值，获取对应数据
+
+5.判断是否为空
+
+6.转换成std::map<>映射
+
 需要使用到c++的boost库
 
 Mac OS上使用brew的安装方法：
 
 	brew install boost
+
+
+	
+[源码](https://github.com/traviszeng/ConcurrentCPPPractice/blob/master/ConcurrentCPPPractice/THREADSAFE_LOOKUP_TABLE.h)
 	
 
+#### 使用细粒度锁支持迭代器的线程安全的链表
 
+满足条件的链表需要有以下功能：
+
+1.向列表添加一个元素 
+
+2.当某个条件满足时，就从链表中删除某个元素 
+
+3.当某个条件满足时，从链表中查找某个元素 
+
+4.当某个条件满足时，更新链表中的某个元素 
+
+5.将当前容器中链表中的每个元素，复制到另一个容器中
+
+[源码](https://github.com/traviszeng/ConcurrentCPPPractice/blob/master/ConcurrentCPPPractice/THREADSAFE_LIST.h)
 
 
