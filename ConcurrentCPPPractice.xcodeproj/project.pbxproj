@@ -26,6 +26,9 @@
 		B410BF28237BABD800509054 /* ConcurrentHelloWorld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConcurrentHelloWorld.cpp; sourceTree = "<group>"; };
 		B4311C8C2384E664004768C0 /* THREADSAFE_LOOKUP_TABLE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = THREADSAFE_LOOKUP_TABLE.h; sourceTree = "<group>"; };
 		B4311C8E2386CA64004768C0 /* THREADSAFE_LIST.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = THREADSAFE_LIST.h; sourceTree = "<group>"; };
+		B4801516238970CB000C6D14 /* MESSAGE_QUEUE.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MESSAGE_QUEUE.h; path = "Concurrent ATM/MESSAGE_QUEUE.h"; sourceTree = "<group>"; };
+		B4801517238976EF000C6D14 /* SENDER.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SENDER.h; path = "Concurrent ATM/SENDER.h"; sourceTree = "<group>"; };
+		B480151823897A26000C6D14 /* RECEIVER.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RECEIVER.h; path = "Concurrent ATM/RECEIVER.h"; sourceTree = "<group>"; };
 		B49B5608237BA450003D29B1 /* ConcurrentCPPPractice */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ConcurrentCPPPractice; sourceTree = BUILT_PRODUCTS_DIR; };
 		B4F48AE3237ED54200C8D487 /* threadsafe_stack.h */ = {isa = PBXFileReference; fileEncoding = 2147484705; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = threadsafe_stack.h; sourceTree = "<group>"; };
 		B4F48AE4237EDF7400C8D487 /* THREADSAFE_QUEUE_with_condition_variable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = THREADSAFE_QUEUE_with_condition_variable.h; sourceTree = "<group>"; };
@@ -76,6 +79,9 @@
 				B4F48AEB238415DB00C8D487 /* THREADSAFE_QUEUE_with_fined_grained_lock_and_condition_variable.h */,
 				B4311C8C2384E664004768C0 /* THREADSAFE_LOOKUP_TABLE.h */,
 				B4311C8E2386CA64004768C0 /* THREADSAFE_LIST.h */,
+				B4801516238970CB000C6D14 /* MESSAGE_QUEUE.h */,
+				B4801517238976EF000C6D14 /* SENDER.h */,
+				B480151823897A26000C6D14 /* RECEIVER.h */,
 			);
 			path = ConcurrentCPPPractice;
 			sourceTree = "<group>";
