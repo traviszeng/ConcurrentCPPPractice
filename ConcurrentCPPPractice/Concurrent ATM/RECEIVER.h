@@ -8,7 +8,7 @@
 
 #ifndef RECEIVER_h
 #define RECEIVER_h
-#include"DISPATCH.h"
+
 
 namespace messaging {
 class receiver{

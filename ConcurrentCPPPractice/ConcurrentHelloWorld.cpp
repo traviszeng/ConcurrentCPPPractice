@@ -23,6 +23,13 @@
 #include"THREADSAFE_LOOKUP_TABLE.h"
 #include"THREADSAFE_LIST.h"
 #include"Concurrent ATM/MESSAGE_QUEUE.h"
+#include"Concurrent ATM/SENDER.h"
+#include "Concurrent ATM/TEMPLATEDISPATCHER.h"
+#include "Concurrent ATM/DISPATCHER.h"
+#include"Concurrent ATM/RECEIVER.h"
+#include"Concurrent ATM/MESSAGE.h" 
+#include"Concurrent ATM/ATM.h"
+#include"Concurrent ATM/INTERFACE_MACHINE.h"
 
 using namespace std;
 
